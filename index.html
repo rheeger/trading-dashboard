@@ -186,14 +186,14 @@
   <h1>⚡ Trading Dashboard</h1>
   <div class="meta">
     <span class="live-dot"></span> <span id="live-status">Connecting to HL...</span><br>
-    Snapshot: Feb 21, 2026 14:54 UTC
+    Snapshot: Feb 21, 2026 14:58 UTC
   </div>
 </div>
 
 <div class="summary">
   <div class="summary-card">
     <div class="label">Account Value</div>
-    <div class="value" id="account-value">$1,054.33</div>
+    <div class="value" id="account-value">$1,054.18</div>
   </div>
   <div class="summary-card">
     <div class="label">Net uPnL</div>
@@ -366,7 +366,7 @@ async function fetchPrices() {
 
     // Estimate account value
     const snapshotUpnl = 0;
-    const snapshotAcctVal = 1054.333249;
+    const snapshotAcctVal = 1054.184739;
     const liveAcctVal = snapshotAcctVal + (totalUpnl - snapshotUpnl);
     const acctEl = document.getElementById('account-value');
     acctEl.textContent = '$' + liveAcctVal.toFixed(2);
