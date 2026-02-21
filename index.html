@@ -21,9 +21,13 @@
   .dim { color: var(--dim); }
   .positive { color: var(--positive); }
   .negative { color: var(--negative); }
-  .flash { animation: flash 0.4s ease; }
-  @keyframes flash {
-    0% { opacity: 0.5; } 100% { opacity: 1; }
+  .flash-up { animation: flashUp 0.6s ease; }
+  .flash-down { animation: flashDown 0.6s ease; }
+  @keyframes flashUp {
+    0% { background: rgba(0, 230, 118, 0.3); } 100% { background: transparent; }
+  }
+  @keyframes flashDown {
+    0% { background: rgba(255, 82, 82, 0.3); } 100% { background: transparent; }
   }
 
   .header {
@@ -175,22 +179,22 @@
   <h1>⚡ Trading Dashboard</h1>
   <div class="meta">
     <span class="live-dot"></span> <span id="live-status">Connecting to HL...</span><br>
-    Snapshot: Feb 21, 2026 05:30 UTC
+    Snapshot: Feb 21, 2026 05:32 UTC
   </div>
 </div>
 
 <div class="summary">
   <div class="summary-card">
     <div class="label">Account Value</div>
-    <div class="value" id="account-value">$1,037.85</div>
+    <div class="value" id="account-value">$1,038.01</div>
   </div>
   <div class="summary-card">
     <div class="label">Net uPnL</div>
-    <div class="value negative" id="net-upnl">$-2.14</div>
+    <div class="value negative" id="net-upnl">$-2.20</div>
   </div>
   <div class="summary-card">
     <div class="label">Margin Used</div>
-    <div class="value">$932</div>
+    <div class="value">$933</div>
   </div>
   <div class="summary-card">
     <div class="label">Initial</div>
@@ -231,8 +235,8 @@
       <td class="asset-cell"><strong>HYPE</strong></td>
       <td><span class="dir-badge long">LONG</span> <span class="dim">5×</span></td>
       <td>$30.1196</td>
-      <td class="mark-price" data-asset="HYPE">$30.2155</td>
-      <td class="upnl-cell positive" data-asset="HYPE">+$4.98 <span class="dim">(+1.6%)</span></td>
+      <td class="mark-price" data-asset="HYPE">$30.2365</td>
+      <td class="upnl-cell positive" data-asset="HYPE">+$6.07 <span class="dim">(+1.9%)</span></td>
       <td>🟡 Accumulate</td>
       <td>None</td>
       <td>$0.00</td>
@@ -242,8 +246,8 @@
       <td class="asset-cell"><strong>SOL</strong></td>
       <td><span class="dir-badge long">LONG</span> <span class="dim">5×</span></td>
       <td>$84.4530</td>
-      <td class="mark-price" data-asset="SOL">$84.4275</td>
-      <td class="upnl-cell negative" data-asset="SOL">$-0.47 <span class="dim">(-0.1%)</span></td>
+      <td class="mark-price" data-asset="SOL">$84.3775</td>
+      <td class="upnl-cell negative" data-asset="SOL">$-1.40 <span class="dim">(-0.5%)</span></td>
       <td>🟡 Accumulate</td>
       <td>None</td>
       <td>$0.00</td>
@@ -253,8 +257,8 @@
       <td class="asset-cell"><strong>XRP</strong></td>
       <td><span class="dir-badge short">SHORT</span> <span class="dim">5×</span></td>
       <td>$1.4231</td>
-      <td class="mark-price" data-asset="XRP">$1.4291</td>
-      <td class="upnl-cell negative" data-asset="XRP">$-6.65 <span class="dim">(-2.1%)</span></td>
+      <td class="mark-price" data-asset="XRP">$1.4293</td>
+      <td class="upnl-cell negative" data-asset="XRP">$-6.87 <span class="dim">(-2.2%)</span></td>
       <td>🟡 Accumulate</td>
       <td>None</td>
       <td>$0.00</td>
@@ -273,12 +277,12 @@
           <span class="dim">5×</span>
         </div>
         <div class="chart-pnl positive" data-asset="HYPE-chart-pnl">
-          +$4.98 (+1.6%)
+          +$6.07 (+1.9%)
         </div>
       </div>
       <div class="chart-meta">
         <span>Entry: <strong>$30.1196</strong></span>
-        <span>Mark: <strong class="live-mark" data-asset="HYPE">$30.2155</strong></span>
+        <span>Mark: <strong class="live-mark" data-asset="HYPE">$30.2365</strong></span>
         <span>SL: <strong>$27.1130</strong></span>
         <span>TP: <strong>$36.1500</strong></span>
         <span>Floor: <strong>$30.0144</strong></span>
@@ -307,10 +311,10 @@
         });
       </script>
       <div class="tier-section">
-        <div class="tier-label">Tier Progress — next tier in 8.4%</div>
+        <div class="tier-label">Tier Progress — next tier in 8.1%</div>
         <div class="tier-track">
           <div class="tier-dot " style="left:10%" title="Tier 1: +10% → lock +5%"></div><div class="tier-dot " style="left:20%" title="Tier 2: +20% → lock +14%"></div><div class="tier-dot " style="left:30%" title="Tier 3: +30% → lock +22%"></div><div class="tier-dot " style="left:50%" title="Tier 4: +50% → lock +40%"></div><div class="tier-dot " style="left:75%" title="Tier 5: +75% → lock +60%"></div><div class="tier-dot " style="left:100%" title="Tier 6: +100% → lock +80%"></div>
-          <div class="current-marker" style="left:1.59%"></div>
+          <div class="current-marker" style="left:1.94%"></div>
         </div>
         <div class="tier-labels">
           <span style="left:10%">10%</span><span style="left:20%">20%</span><span style="left:30%">30%</span><span style="left:50%">50%</span><span style="left:75%">75%</span><span style="left:100%">100%</span>
@@ -326,12 +330,12 @@
           <span class="dim">5×</span>
         </div>
         <div class="chart-pnl negative" data-asset="SOL-chart-pnl">
-          $-0.47 (-0.1%)
+          $-1.40 (-0.5%)
         </div>
       </div>
       <div class="chart-meta">
         <span>Entry: <strong>$84.4530</strong></span>
-        <span>Mark: <strong class="live-mark" data-asset="SOL">$84.4275</strong></span>
+        <span>Mark: <strong class="live-mark" data-asset="SOL">$84.3775</strong></span>
         <span>SL: <strong>$75.9960</strong></span>
         <span>TP: <strong>$101.3300</strong></span>
         <span>Floor: <strong>$84.0062</strong></span>
@@ -360,7 +364,7 @@
         });
       </script>
       <div class="tier-section">
-        <div class="tier-label">Tier Progress — next tier in 10.2%</div>
+        <div class="tier-label">Tier Progress — next tier in 10.4%</div>
         <div class="tier-track">
           <div class="tier-dot " style="left:10%" title="Tier 1: +10% → lock +5%"></div><div class="tier-dot " style="left:20%" title="Tier 2: +20% → lock +14%"></div><div class="tier-dot " style="left:30%" title="Tier 3: +30% → lock +22%"></div><div class="tier-dot " style="left:50%" title="Tier 4: +50% → lock +40%"></div><div class="tier-dot " style="left:75%" title="Tier 5: +75% → lock +60%"></div><div class="tier-dot " style="left:100%" title="Tier 6: +100% → lock +80%"></div>
           <div class="current-marker" style="left:0%"></div>
@@ -379,12 +383,12 @@
           <span class="dim">5×</span>
         </div>
         <div class="chart-pnl negative" data-asset="XRP-chart-pnl">
-          $-6.65 (-2.1%)
+          $-6.87 (-2.2%)
         </div>
       </div>
       <div class="chart-meta">
         <span>Entry: <strong>$1.4231</strong></span>
-        <span>Mark: <strong class="live-mark" data-asset="XRP">$1.4291</strong></span>
+        <span>Mark: <strong class="live-mark" data-asset="XRP">$1.4293</strong></span>
         <span>SL: <strong>$1.5655</strong></span>
         <span>TP: <strong>$1.1385</strong></span>
         <span>Floor: <strong>$1.4396</strong></span>
@@ -413,7 +417,7 @@
         });
       </script>
       <div class="tier-section">
-        <div class="tier-label">Tier Progress — next tier in 12.1%</div>
+        <div class="tier-label">Tier Progress — next tier in 12.2%</div>
         <div class="tier-track">
           <div class="tier-dot " style="left:10%" title="Tier 1: +10% → lock +5%"></div><div class="tier-dot " style="left:20%" title="Tier 2: +20% → lock +14%"></div><div class="tier-dot " style="left:30%" title="Tier 3: +30% → lock +22%"></div><div class="tier-dot " style="left:50%" title="Tier 4: +50% → lock +40%"></div><div class="tier-dot " style="left:75%" title="Tier 5: +75% → lock +60%"></div><div class="tier-dot " style="left:100%" title="Tier 6: +100% → lock +80%"></div>
           <div class="current-marker" style="left:0%"></div>
@@ -469,7 +473,6 @@ async function fetchPrices() {
     POSITIONS.forEach(pos => {
       const price = parseFloat(mids[pos.asset]);
       if (!price) return;
-      lastPrices[pos.asset] = price;
 
       // Calculate uPnL
       let upnl;
@@ -486,11 +489,23 @@ async function fetchPrices() {
       const pctSign = upnlPct >= 0 ? '+' : '';
       const cls = upnl >= 0 ? 'positive' : 'negative';
 
+      // Determine direction of price change
+      const prev = lastPrices[pos.asset] || pos.entry;
+      const flashCls = price > prev ? 'flash-up' : price < prev ? 'flash-down' : '';
+
+      // Flash helper
+      function flashEl(el) {
+        if (!flashCls) return;
+        el.classList.remove('flash-up', 'flash-down');
+        void el.offsetWidth; // reflow to restart animation
+        el.classList.add(flashCls);
+        setTimeout(() => el.classList.remove(flashCls), 600);
+      }
+
       // Update mark price in table
       document.querySelectorAll(`.mark-price[data-asset="${pos.asset}"]`).forEach(el => {
         el.textContent = '$' + price.toFixed(4);
-        el.classList.add('flash');
-        setTimeout(() => el.classList.remove('flash'), 400);
+        flashEl(el);
       });
 
       // Update uPnL in table
@@ -498,31 +513,51 @@ async function fetchPrices() {
         el.className = 'upnl-cell ' + cls;
         el.innerHTML = sign + '$' + upnl.toFixed(2) +
           ' <span class="dim">(' + pctSign + upnlPct.toFixed(1) + '%)</span>';
+        flashEl(el);
       });
 
       // Update chart header PnL
       document.querySelectorAll(`[data-asset="${pos.asset}-chart-pnl"]`).forEach(el => {
         el.className = 'chart-pnl ' + cls;
         el.textContent = sign + '$' + upnl.toFixed(2) + ' (' + pctSign + upnlPct.toFixed(1) + '%)';
+        flashEl(el);
       });
 
       // Update live mark in chart meta
       document.querySelectorAll(`.live-mark[data-asset="${pos.asset}"]`).forEach(el => {
         el.textContent = '$' + price.toFixed(4);
       });
+
+      // Store for next comparison
+      lastPrices[pos.asset] = price;
     });
 
-    // Update summary cards
+    // Update summary cards with flash
+    const prevUpnl = parseFloat((document.getElementById('net-upnl').textContent || '0').replace(/[^\d.-]/g, '')) || 0;
     const netEl = document.getElementById('net-upnl');
     const netSign = totalUpnl >= 0 ? '+' : '';
     netEl.textContent = netSign + '$' + totalUpnl.toFixed(2);
     netEl.className = 'value ' + (totalUpnl >= 0 ? 'positive' : 'negative');
+    const netFlash = totalUpnl > prevUpnl ? 'flash-up' : totalUpnl < prevUpnl ? 'flash-down' : '';
+    if (netFlash) {
+      netEl.classList.remove('flash-up', 'flash-down');
+      void netEl.offsetWidth;
+      netEl.classList.add(netFlash);
+      setTimeout(() => netEl.classList.remove(netFlash), 600);
+    }
 
-    // Estimate account value (margin + free + upnl ≈ snapshot value adjusted by upnl delta)
-    const snapshotUpnl = -2.1399999999999997;
-    const snapshotAcctVal = 1037.854406;
+    // Estimate account value
+    const snapshotUpnl = -2.2;
+    const snapshotAcctVal = 1038.012756;
     const liveAcctVal = snapshotAcctVal + (totalUpnl - snapshotUpnl);
-    document.getElementById('account-value').textContent = '$' + liveAcctVal.toFixed(2);
+    const acctEl = document.getElementById('account-value');
+    acctEl.textContent = '$' + liveAcctVal.toFixed(2);
+    if (netFlash) {
+      acctEl.classList.remove('flash-up', 'flash-down');
+      void acctEl.offsetWidth;
+      acctEl.classList.add(netFlash);
+      setTimeout(() => acctEl.classList.remove(netFlash), 600);
+    }
 
     // Progress bar
     const pct = Math.min(100, Math.max(0, liveAcctVal / TARGET * 100));
