@@ -7,283 +7,164 @@
 <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 <style>
   :root {
-    --bg: #0d1117;
-    --card: #161b22;
-    --border: #30363d;
-    --text: #e6edf3;
-    --dim: #8b949e;
-    --positive: #00e676;
-    --negative: #ff5252;
-    --accent: #58a6ff;
-    --long: #00e676;
-    --short: #ff5252;
+    --bg: #0d1117; --card: #161b22; --border: #30363d;
+    --text: #e6edf3; --dim: #8b949e;
+    --positive: #00e676; --negative: #ff5252; --accent: #58a6ff;
+    --long: #00e676; --short: #ff5252;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+    background: var(--bg); color: var(--text);
+    padding: 20px; max-width: 1200px; margin: 0 auto;
   }
   .dim { color: var(--dim); }
   .positive { color: var(--positive); }
   .negative { color: var(--negative); }
+  .flash { animation: flash 0.4s ease; }
+  @keyframes flash {
+    0% { opacity: 0.5; } 100% { opacity: 1; }
+  }
 
-  /* Header */
   .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
   }
   .header h1 { font-size: 1.3em; }
   .header .meta { color: var(--dim); font-size: 0.8em; text-align: right; }
+  .live-dot {
+    display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--positive); margin-right: 6px;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
+  }
 
-  /* Summary cards */
   .summary {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 12px;
-    margin-bottom: 20px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px; margin-bottom: 20px;
   }
   .summary-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px;
-    text-align: center;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px; text-align: center;
   }
   .summary-card .label {
-    color: var(--dim);
-    font-size: 0.7em;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    color: var(--dim); font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.05em;
   }
-  .summary-card .value {
-    font-size: 1.3em;
-    font-weight: 700;
-    margin-top: 4px;
-  }
+  .summary-card .value { font-size: 1.3em; font-weight: 700; margin-top: 4px; }
 
-  /* Progress bar */
   .progress-container {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px;
-    margin-bottom: 20px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px; margin-bottom: 20px;
   }
   .progress-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 0.85em;
+    display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85em;
   }
   .progress-bar {
-    height: 8px;
-    background: var(--border);
-    border-radius: 4px;
-    overflow: hidden;
+    height: 8px; background: var(--border); border-radius: 4px; overflow: hidden;
   }
   .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent), var(--positive));
-    border-radius: 4px;
-    transition: width 0.5s ease;
+    height: 100%; background: linear-gradient(90deg, var(--accent), var(--positive));
+    border-radius: 4px; transition: width 0.5s ease;
   }
 
-  /* Positions table */
   .table-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow-x: auto;
-    margin-bottom: 24px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; overflow-x: auto; margin-bottom: 24px;
   }
-  .table-card h3 {
-    padding: 14px 16px 0;
-    font-size: 0.95em;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85em;
-  }
+  .table-card h3 { padding: 14px 16px 0; font-size: 0.95em; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
   th {
-    text-align: left;
-    padding: 10px 12px;
-    color: var(--dim);
-    font-weight: 500;
-    font-size: 0.75em;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    text-align: left; padding: 10px 12px; color: var(--dim); font-weight: 500;
+    font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.05em;
     border-bottom: 1px solid var(--border);
   }
-  td {
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
   tr:last-child td { border-bottom: none; }
   tr:hover { background: rgba(88, 166, 255, 0.04); }
   .asset-cell { font-weight: 600; }
 
-  /* Direction badges */
   .dir-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 0.8em;
-    font-weight: 600;
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-size: 0.8em; font-weight: 600;
   }
   .dir-badge.long { background: rgba(0, 230, 118, 0.15); color: var(--long); }
   .dir-badge.short { background: rgba(255, 82, 82, 0.15); color: var(--short); }
 
-  /* Chart cards */
   .chart-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    margin-bottom: 20px;
-    overflow: hidden;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 20px; overflow: hidden;
   }
   .chart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 16px; border-bottom: 1px solid var(--border);
   }
-  .chart-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+  .chart-title { display: flex; align-items: center; gap: 8px; }
   .asset-name { font-size: 1.15em; font-weight: 700; }
   .chart-pnl { font-size: 1.1em; font-weight: 700; }
   .chart-meta {
-    display: flex;
-    gap: 16px;
-    padding: 10px 16px;
-    font-size: 0.8em;
-    color: var(--dim);
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
+    display: flex; gap: 16px; padding: 10px 16px; font-size: 0.8em;
+    color: var(--dim); border-bottom: 1px solid var(--border); flex-wrap: wrap;
   }
   .chart-meta strong { color: var(--text); }
-  .tv-chart {
-    height: 420px;
-    width: 100%;
-  }
+  .tv-chart { height: 420px; width: 100%; }
 
-  /* Tier progress */
-  .tier-section {
-    padding: 12px 16px;
-    border-top: 1px solid var(--border);
-  }
+  .tier-section { padding: 12px 16px; border-top: 1px solid var(--border); }
   .tier-label {
-    color: var(--dim);
-    font-size: 0.75em;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 8px;
+    color: var(--dim); font-size: 0.75em; text-transform: uppercase;
+    letter-spacing: 0.05em; margin-bottom: 8px;
   }
   .tier-track {
-    position: relative;
-    height: 8px;
-    background: var(--border);
-    border-radius: 4px;
-    margin-bottom: 18px;
+    position: relative; height: 8px; background: var(--border);
+    border-radius: 4px; margin-bottom: 18px;
   }
   .tier-dot {
-    position: absolute;
-    top: -4px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: var(--border);
-    border: 2px solid #444;
-    transform: translateX(-50%);
-    z-index: 2;
+    position: absolute; top: -4px; width: 16px; height: 16px;
+    border-radius: 50%; background: var(--border); border: 2px solid #444;
+    transform: translateX(-50%); z-index: 2;
   }
   .tier-dot.triggered {
-    background: var(--positive);
-    border-color: var(--positive);
+    background: var(--positive); border-color: var(--positive);
     box-shadow: 0 0 8px rgba(0, 230, 118, 0.4);
   }
   .current-marker {
-    position: absolute;
-    top: -6px;
-    width: 4px;
-    height: 20px;
-    background: var(--accent);
-    border-radius: 2px;
-    transform: translateX(-50%);
-    z-index: 3;
-    box-shadow: 0 0 6px rgba(88, 166, 255, 0.5);
+    position: absolute; top: -6px; width: 4px; height: 20px;
+    background: var(--accent); border-radius: 2px; transform: translateX(-50%);
+    z-index: 3; box-shadow: 0 0 6px rgba(88, 166, 255, 0.5);
   }
   .tier-labels {
-    position: relative;
-    height: 16px;
-    font-size: 0.65em;
-    color: var(--dim);
+    position: relative; height: 16px; font-size: 0.65em; color: var(--dim);
   }
-  .tier-labels span {
-    position: absolute;
-    transform: translateX(-50%);
-  }
+  .tier-labels span { position: absolute; transform: translateX(-50%); }
 
-  /* Phase explainer */
   .explainer {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 16px;
-    margin-top: 24px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px; margin-top: 24px;
   }
   .explainer h3 { margin-bottom: 12px; font-size: 0.95em; }
   .explainer p {
-    color: var(--dim);
-    font-size: 0.82em;
-    line-height: 1.6;
-    margin-bottom: 8px;
+    color: var(--dim); font-size: 0.82em; line-height: 1.6; margin-bottom: 8px;
   }
   .explainer .hl { color: var(--text); font-weight: 600; }
 
-  /* Recipes link */
   .recipes-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 16px;
-    margin-top: 16px;
-    color: var(--accent);
-    text-decoration: none;
-    font-size: 0.85em;
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 16px; margin-top: 16px;
+    color: var(--accent); text-decoration: none; font-size: 0.85em;
     transition: border-color 0.2s;
   }
   .recipes-link:hover { border-color: var(--accent); }
 
   .footer {
-    text-align: center;
-    color: var(--dim);
-    font-size: 0.7em;
-    margin-top: 24px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
+    text-align: center; color: var(--dim); font-size: 0.7em;
+    margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);
   }
 
   @media (max-width: 768px) {
     body { padding: 12px; }
     .tv-chart { height: 320px; }
-    .chart-meta { gap: 10px; }
     .summary { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
@@ -293,26 +174,26 @@
 <div class="header">
   <h1>⚡ Trading Dashboard</h1>
   <div class="meta">
-    Updated: Feb 21, 2026 05:25 UTC<br>
-    Strategy: e5682bc7…
+    <span class="live-dot"></span> <span id="live-status">Connecting to HL...</span><br>
+    Snapshot: Feb 21, 2026 05:30 UTC
   </div>
 </div>
 
 <div class="summary">
   <div class="summary-card">
+    <div class="label">Account Value</div>
+    <div class="value" id="account-value">$1,037.85</div>
+  </div>
+  <div class="summary-card">
     <div class="label">Net uPnL</div>
-    <div class="value negative">$-2.51</div>
+    <div class="value negative" id="net-upnl">$-2.14</div>
   </div>
   <div class="summary-card">
-    <div class="label">Positions</div>
-    <div class="value">3</div>
+    <div class="label">Margin Used</div>
+    <div class="value">$932</div>
   </div>
   <div class="summary-card">
-    <div class="label">Margin Deployed</div>
-    <div class="value">$939</div>
-  </div>
-  <div class="summary-card">
-    <div class="label">Balance</div>
+    <div class="label">Initial</div>
     <div class="value">$1,230</div>
   </div>
   <div class="summary-card">
@@ -328,10 +209,10 @@
 <div class="progress-container">
   <div class="progress-header">
     <span>Progress to $2,500</span>
-    <span class="dim">$1,227 / $2,500 (49.1%)</span>
+    <span class="dim" id="progress-text">$1,038 / $2,500 (41.5%)</span>
   </div>
   <div class="progress-bar">
-    <div class="progress-fill" style="width: 49.1%"></div>
+    <div class="progress-fill" id="progress-bar" style="width: 41.5%"></div>
   </div>
 </div>
 
@@ -340,47 +221,40 @@
   <table>
     <thead>
       <tr>
-        <th>Asset</th>
-        <th>Direction</th>
-        <th>Entry</th>
-        <th>Mark</th>
-        <th>uPnL</th>
-        <th>Phase</th>
-        <th>Tier</th>
-        <th>Locked</th>
-        <th>Breaches</th>
+        <th>Asset</th><th>Direction</th><th>Entry</th><th>Mark</th>
+        <th>uPnL</th><th>Phase</th><th>Tier</th><th>Locked</th><th>Breaches</th>
       </tr>
     </thead>
     <tbody>
       
-    <tr>
+    <tr data-asset="HYPE">
       <td class="asset-cell"><strong>HYPE</strong></td>
       <td><span class="dir-badge long">LONG</span> <span class="dim">5×</span></td>
       <td>$30.1196</td>
-      <td>$30.2065</td>
-      <td class="positive">+$4.51 <span class="dim">(+1.4%)</span></td>
+      <td class="mark-price" data-asset="HYPE">$30.2155</td>
+      <td class="upnl-cell positive" data-asset="HYPE">+$4.98 <span class="dim">(+1.6%)</span></td>
       <td>🟡 Accumulate</td>
       <td>None</td>
       <td>$0.00</td>
       <td>0/2</td>
     </tr>
-    <tr>
+    <tr data-asset="SOL">
       <td class="asset-cell"><strong>SOL</strong></td>
       <td><span class="dir-badge long">LONG</span> <span class="dim">5×</span></td>
       <td>$84.4530</td>
-      <td>$84.3975</td>
-      <td class="negative">$-1.03 <span class="dim">(-0.3%)</span></td>
+      <td class="mark-price" data-asset="SOL">$84.4275</td>
+      <td class="upnl-cell negative" data-asset="SOL">$-0.47 <span class="dim">(-0.1%)</span></td>
       <td>🟡 Accumulate</td>
       <td>None</td>
       <td>$0.00</td>
       <td>0/2</td>
     </tr>
-    <tr>
+    <tr data-asset="XRP">
       <td class="asset-cell"><strong>XRP</strong></td>
       <td><span class="dir-badge short">SHORT</span> <span class="dim">5×</span></td>
       <td>$1.4231</td>
-      <td>$1.4285</td>
-      <td class="negative">$-5.99 <span class="dim">(-1.9%)</span></td>
+      <td class="mark-price" data-asset="XRP">$1.4291</td>
+      <td class="upnl-cell negative" data-asset="XRP">$-6.65 <span class="dim">(-2.1%)</span></td>
       <td>🟡 Accumulate</td>
       <td>None</td>
       <td>$0.00</td>
@@ -394,14 +268,17 @@
     <div class="chart-card">
       <div class="chart-header">
         <div class="chart-title">
-          <span class="asset-name">HYPE</span> <span class="dir-badge long">LONG</span> <span class="dim">5×</span>
+          <span class="asset-name">HYPE</span>
+          <span class="dir-badge long">LONG</span>
+          <span class="dim">5×</span>
         </div>
-        <div class="chart-pnl positive">
-          +$4.51 (+1.4%)
+        <div class="chart-pnl positive" data-asset="HYPE-chart-pnl">
+          +$4.98 (+1.6%)
         </div>
       </div>
       <div class="chart-meta">
         <span>Entry: <strong>$30.1196</strong></span>
+        <span>Mark: <strong class="live-mark" data-asset="HYPE">$30.2155</strong></span>
         <span>SL: <strong>$27.1130</strong></span>
         <span>TP: <strong>$36.1500</strong></span>
         <span>Floor: <strong>$30.0144</strong></span>
@@ -430,10 +307,10 @@
         });
       </script>
       <div class="tier-section">
-        <div class="tier-label">Tier Progress — next tier in 8.6%</div>
+        <div class="tier-label">Tier Progress — next tier in 8.4%</div>
         <div class="tier-track">
           <div class="tier-dot " style="left:10%" title="Tier 1: +10% → lock +5%"></div><div class="tier-dot " style="left:20%" title="Tier 2: +20% → lock +14%"></div><div class="tier-dot " style="left:30%" title="Tier 3: +30% → lock +22%"></div><div class="tier-dot " style="left:50%" title="Tier 4: +50% → lock +40%"></div><div class="tier-dot " style="left:75%" title="Tier 5: +75% → lock +60%"></div><div class="tier-dot " style="left:100%" title="Tier 6: +100% → lock +80%"></div>
-          <div class="current-marker" style="left:1.44%"></div>
+          <div class="current-marker" style="left:1.59%"></div>
         </div>
         <div class="tier-labels">
           <span style="left:10%">10%</span><span style="left:20%">20%</span><span style="left:30%">30%</span><span style="left:50%">50%</span><span style="left:75%">75%</span><span style="left:100%">100%</span>
@@ -444,14 +321,17 @@
     <div class="chart-card">
       <div class="chart-header">
         <div class="chart-title">
-          <span class="asset-name">SOL</span> <span class="dir-badge long">LONG</span> <span class="dim">5×</span>
+          <span class="asset-name">SOL</span>
+          <span class="dir-badge long">LONG</span>
+          <span class="dim">5×</span>
         </div>
-        <div class="chart-pnl negative">
-          $-1.03 (-0.3%)
+        <div class="chart-pnl negative" data-asset="SOL-chart-pnl">
+          $-0.47 (-0.1%)
         </div>
       </div>
       <div class="chart-meta">
         <span>Entry: <strong>$84.4530</strong></span>
+        <span>Mark: <strong class="live-mark" data-asset="SOL">$84.4275</strong></span>
         <span>SL: <strong>$75.9960</strong></span>
         <span>TP: <strong>$101.3300</strong></span>
         <span>Floor: <strong>$84.0062</strong></span>
@@ -480,7 +360,7 @@
         });
       </script>
       <div class="tier-section">
-        <div class="tier-label">Tier Progress — next tier in 10.3%</div>
+        <div class="tier-label">Tier Progress — next tier in 10.2%</div>
         <div class="tier-track">
           <div class="tier-dot " style="left:10%" title="Tier 1: +10% → lock +5%"></div><div class="tier-dot " style="left:20%" title="Tier 2: +20% → lock +14%"></div><div class="tier-dot " style="left:30%" title="Tier 3: +30% → lock +22%"></div><div class="tier-dot " style="left:50%" title="Tier 4: +50% → lock +40%"></div><div class="tier-dot " style="left:75%" title="Tier 5: +75% → lock +60%"></div><div class="tier-dot " style="left:100%" title="Tier 6: +100% → lock +80%"></div>
           <div class="current-marker" style="left:0%"></div>
@@ -494,14 +374,17 @@
     <div class="chart-card">
       <div class="chart-header">
         <div class="chart-title">
-          <span class="asset-name">XRP</span> <span class="dir-badge short">SHORT</span> <span class="dim">5×</span>
+          <span class="asset-name">XRP</span>
+          <span class="dir-badge short">SHORT</span>
+          <span class="dim">5×</span>
         </div>
-        <div class="chart-pnl negative">
-          $-5.99 (-1.9%)
+        <div class="chart-pnl negative" data-asset="XRP-chart-pnl">
+          $-6.65 (-2.1%)
         </div>
       </div>
       <div class="chart-meta">
         <span>Entry: <strong>$1.4231</strong></span>
+        <span>Mark: <strong class="live-mark" data-asset="XRP">$1.4291</strong></span>
         <span>SL: <strong>$1.5655</strong></span>
         <span>TP: <strong>$1.1385</strong></span>
         <span>Floor: <strong>$1.4396</strong></span>
@@ -530,7 +413,7 @@
         });
       </script>
       <div class="tier-section">
-        <div class="tier-label">Tier Progress — next tier in 11.9%</div>
+        <div class="tier-label">Tier Progress — next tier in 12.1%</div>
         <div class="tier-track">
           <div class="tier-dot " style="left:10%" title="Tier 1: +10% → lock +5%"></div><div class="tier-dot " style="left:20%" title="Tier 2: +20% → lock +14%"></div><div class="tier-dot " style="left:30%" title="Tier 3: +30% → lock +22%"></div><div class="tier-dot " style="left:50%" title="Tier 4: +50% → lock +40%"></div><div class="tier-dot " style="left:75%" title="Tier 5: +75% → lock +60%"></div><div class="tier-dot " style="left:100%" title="Tier 6: +100% → lock +80%"></div>
           <div class="current-marker" style="left:0%"></div>
@@ -544,22 +427,9 @@
 
 <div class="explainer">
   <h3>📖 DSL Phase System</h3>
-  <p>
-    <span class="hl">🟡 Phase 1 — Accumulate:</span>
-    Wide 3% trailing stop from high-water mark. Hard SL as absolute floor.
-    3 consecutive breaches needed to close. Gives the trade room to develop.
-  </p>
-  <p>
-    <span class="hl">🟢 Phase 2 — Protect:</span>
-    Activates at first tier (+10% uPnL). Trailing stop tightens to 1.5%.
-    Tier floors ratchet up — locked profit can't be lost. 2 breaches to close.
-  </p>
-  <p>
-    <span class="hl">🎯 Tiers:</span>
-    +10% → lock +5% · +20% → lock +14% · +30% → lock +22% ·
-    +50% → lock +40% · +75% → lock +60% · +100% → lock +80%.
-    Tiers only go up. Higher tiers get tighter trailing stops.
-  </p>
+  <p><span class="hl">🟡 Phase 1 — Accumulate:</span> Wide 3% trailing stop from high-water mark. Hard SL as absolute floor. 3 consecutive breaches needed to close.</p>
+  <p><span class="hl">🟢 Phase 2 — Protect:</span> Activates at first tier (+10%). Trailing stop tightens to 1.5%. Tier floors ratchet up. 2 breaches to close.</p>
+  <p><span class="hl">🎯 Tiers:</span> +10%→lock +5% · +20%→lock +14% · +30%→lock +22% · +50%→lock +40% · +75%→lock +60% · +100%→lock +80%</p>
 </div>
 
 <div style="margin-top: 20px;">
@@ -569,8 +439,107 @@
 </div>
 
 <div class="footer">
-  Auto-generated by heartbeat · Data from Senpi via DSL v3 · <a href="https://senpi.ai" style="color:var(--accent)">senpi.ai</a>
+  Auto-generated by heartbeat · Prices update live via Hyperliquid API · <a href="https://senpi.ai" style="color:var(--accent)">senpi.ai</a>
 </div>
+
+<script>
+// Position config for live PnL calculation
+const POSITIONS = [{"asset": "HYPE", "direction": "LONG", "leverage": 5, "entry": 30.1196, "size": 51.95, "margin": 313, "sl": 27.113, "tp": 36.15}, {"asset": "SOL", "direction": "LONG", "leverage": 5, "entry": 84.453, "size": 18.53, "margin": 313, "sl": 75.996, "tp": 101.33}, {"asset": "XRP", "direction": "SHORT", "leverage": 5, "entry": 1.4231, "size": 1100, "margin": 313, "sl": 1.5655, "tp": 1.1385}];
+const TARGET = 2500;
+const INITIAL = 1230;
+let lastPrices = {};
+let updateCount = 0;
+
+// Fetch all mid prices from Hyperliquid (public, no auth)
+async function fetchPrices() {
+  try {
+    const resp = await fetch('https://api.hyperliquid.xyz/info', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'allMids' })
+    });
+    const mids = await resp.json();
+    updateCount++;
+    document.getElementById('live-status').textContent =
+      'Live · Updated ' + new Date().toLocaleTimeString() + ' (#' + updateCount + ')';
+
+    let totalUpnl = 0;
+    let totalMargin = 0;
+
+    POSITIONS.forEach(pos => {
+      const price = parseFloat(mids[pos.asset]);
+      if (!price) return;
+      lastPrices[pos.asset] = price;
+
+      // Calculate uPnL
+      let upnl;
+      if (pos.direction === 'LONG') {
+        upnl = (price - pos.entry) * pos.size;
+      } else {
+        upnl = (pos.entry - price) * pos.size;
+      }
+      const upnlPct = (upnl / pos.margin * 100);
+      totalUpnl += upnl;
+      totalMargin += pos.margin;
+
+      const sign = upnl >= 0 ? '+' : '';
+      const pctSign = upnlPct >= 0 ? '+' : '';
+      const cls = upnl >= 0 ? 'positive' : 'negative';
+
+      // Update mark price in table
+      document.querySelectorAll(`.mark-price[data-asset="${pos.asset}"]`).forEach(el => {
+        el.textContent = '$' + price.toFixed(4);
+        el.classList.add('flash');
+        setTimeout(() => el.classList.remove('flash'), 400);
+      });
+
+      // Update uPnL in table
+      document.querySelectorAll(`.upnl-cell[data-asset="${pos.asset}"]`).forEach(el => {
+        el.className = 'upnl-cell ' + cls;
+        el.innerHTML = sign + '$' + upnl.toFixed(2) +
+          ' <span class="dim">(' + pctSign + upnlPct.toFixed(1) + '%)</span>';
+      });
+
+      // Update chart header PnL
+      document.querySelectorAll(`[data-asset="${pos.asset}-chart-pnl"]`).forEach(el => {
+        el.className = 'chart-pnl ' + cls;
+        el.textContent = sign + '$' + upnl.toFixed(2) + ' (' + pctSign + upnlPct.toFixed(1) + '%)';
+      });
+
+      // Update live mark in chart meta
+      document.querySelectorAll(`.live-mark[data-asset="${pos.asset}"]`).forEach(el => {
+        el.textContent = '$' + price.toFixed(4);
+      });
+    });
+
+    // Update summary cards
+    const netEl = document.getElementById('net-upnl');
+    const netSign = totalUpnl >= 0 ? '+' : '';
+    netEl.textContent = netSign + '$' + totalUpnl.toFixed(2);
+    netEl.className = 'value ' + (totalUpnl >= 0 ? 'positive' : 'negative');
+
+    // Estimate account value (margin + free + upnl ≈ snapshot value adjusted by upnl delta)
+    const snapshotUpnl = -2.1399999999999997;
+    const snapshotAcctVal = 1037.854406;
+    const liveAcctVal = snapshotAcctVal + (totalUpnl - snapshotUpnl);
+    document.getElementById('account-value').textContent = '$' + liveAcctVal.toFixed(2);
+
+    // Progress bar
+    const pct = Math.min(100, Math.max(0, liveAcctVal / TARGET * 100));
+    document.getElementById('progress-bar').style.width = pct.toFixed(1) + '%';
+    document.getElementById('progress-text').textContent =
+      '$' + liveAcctVal.toFixed(0) + ' / $' + TARGET.toLocaleString() + ' (' + pct.toFixed(1) + '%)';
+
+  } catch (err) {
+    document.getElementById('live-status').textContent = 'HL API error — retrying...';
+    console.error('Price fetch error:', err);
+  }
+}
+
+// Initial fetch + poll every 5 seconds
+fetchPrices();
+setInterval(fetchPrices, 5000);
+</script>
 
 </body>
 </html>
