@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Senpi Trading Dashboard</title>
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0e17; color: #e1e5eb; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+  }
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px; border-bottom: 1px solid #1a2035;
+    background: linear-gradient(180deg, #0f1520 0%, #0a0e17 100%);
+  }
+  .header h1 { font-size: 20px; font-weight: 600; }
+  .header h1 span { color: #3b82f6; }
+  .header-right { display: flex; align-items: center; gap: 16px; font-size: 13px; color: #8892a4; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; display: inline-block; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  .portfolio-bar {
+    display: flex; gap: 32px; padding: 16px 24px; border-bottom: 1px solid #1a2035;
+    background: #0d1220;
+  }
+  .portfolio-stat { display: flex; flex-direction: column; gap: 2px; }
+  .portfolio-stat .label { font-size: 11px; color: #5a6478; text-transform: uppercase; letter-spacing: 0.5px; }
+  .portfolio-stat .value { font-size: 18px; font-weight: 600; }
+  .portfolio-stat .value.green { color: #22c55e; }
+  .portfolio-stat .value.red { color: #ef4444; }
+
+  .positions { padding: 16px 24px; display: flex; flex-direction: column; gap: 20px; }
+  .position-card {
+    background: #111827; border: 1px solid #1e293b; border-radius: 12px; overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .position-card:hover { border-color: #334155; }
+  .position-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px; border-bottom: 1px solid #1e293b;
+  }
+  .position-title { display: flex; align-items: center; gap: 10px; }
+  .position-title h2 { font-size: 16px; font-weight: 600; }
+  .badge {
+    font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .badge.long { background: rgba(34,197,94,0.15); color: #22c55e; }
+  .badge.short { background: rgba(239,68,68,0.15); color: #ef4444; }
+  .score-badge { font-size: 12px; color: #8892a4; }
+  .score-badge strong { color: #3b82f6; }
+
+  .position-body { display: grid; grid-template-columns: 1fr 300px; min-height: 340px; }
+  .chart-container { position: relative; min-height: 340px; }
+  .chart-container .chart { width: 100%; height: 100%; }
+
+  .position-details {
+    padding: 14px 18px; border-left: 1px solid #1e293b;
+    display: flex; flex-direction: column; gap: 10px; font-size: 13px;
+  }
+  .detail-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px 0;
+  }
+  .detail-row .label { color: #5a6478; }
+  .detail-row .value { font-weight: 500; font-variant-numeric: tabular-nums; }
+
+  .detail-section { border-top: 1px solid #1e293b; padding-top: 10px; margin-top: 2px; }
+  .detail-section-title { font-size: 11px; color: #5a6478; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+
+  .level-indicator {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .level-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .level-dot.entry { background: #3b82f6; }
+  .level-dot.sl { background: #ef4444; }
+  .level-dot.tp { background: #22c55e; }
+  .level-dot.floor { background: #f59e0b; }
+
+  .progress-bar {
+    width: 100%; height: 6px; background: #1e293b; border-radius: 3px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 3px; transition: width 0.5s;
+  }
+
+  .dsl-phase {
+    display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 4px;
+    font-weight: 600; text-transform: uppercase;
+  }
+  .dsl-phase.accumulate { background: rgba(59,130,246,0.15); color: #3b82f6; }
+  .dsl-phase.trailing { background: rgba(34,197,94,0.15); color: #22c55e; }
+
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 80px 24px; color: #5a6478;
+  }
+  .empty-state h2 { font-size: 18px; margin-bottom: 8px; color: #8892a4; }
+
+  .refresh-spinner { display: none; width: 14px; height: 14px; border: 2px solid #334155; border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  .refresh-spinner.active { display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 768px) {
+    .position-body { grid-template-columns: 1fr; }
+    .position-details { border-left: none; border-top: 1px solid #1e293b; }
+    .portfolio-bar { flex-wrap: wrap; gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>⚡ <span>Senpi</span> Dashboard</h1>
+  <div class="header-right">
+    <div class="refresh-spinner" id="spinner"></div>
+    <span id="last-update">Loading...</span>
+    <span class="status-dot"></span>
+  </div>
+</div>
+
+<div class="portfolio-bar" id="portfolio-bar"></div>
+<div class="positions" id="positions"></div>
+
+<script>
+const HL_API = 'https://api.hyperliquid.xyz/info';
+
+async function fetchCandles(coin, interval = '15m', count = 200) {
+  const now = Date.now();
+  const ms = { '5m': 5*60e3, '15m': 15*60e3, '1h': 3600e3, '4h': 4*3600e3 };
+  const start = now - count * (ms[interval] || 15*60e3);
+  const res = await fetch(HL_API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'candleSnapshot', req: { coin, interval, startTime: start, endTime: now } })
+  });
+  const data = await res.json();
+  return data.map(c => ({
+    time: Math.floor(c.t / 1000),
+    open: parseFloat(c.o), high: parseFloat(c.h),
+    low: parseFloat(c.l), close: parseFloat(c.c),
+    volume: parseFloat(c.v)
+  }));
+}
+
+async function fetchMidPrice(coin) {
+  const res = await fetch(HL_API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'allMids' })
+  });
+  const mids = await res.json();
+  return parseFloat(mids[coin] || 0);
+}
+
+function fmt(n, d = 2) {
+  if (n === undefined || n === null) return '—';
+  return Number(n).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+}
+
+function fmtUSD(n) { return '$' + fmt(n); }
+
+function pnlClass(n) { return n >= 0 ? 'green' : 'red'; }
+
+function timeSince(iso) {
+  const ms = Date.now() - new Date(iso).getTime();
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
+const charts = {};
+
+function createChart(containerId, candles, pos) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+
+  const chart = LightweightCharts.createChart(container, {
+    width: container.clientWidth,
+    height: container.clientHeight || 340,
+    layout: { background: { color: '#111827' }, textColor: '#5a6478', fontSize: 11 },
+    grid: { vertLines: { color: '#1a2035' }, horzLines: { color: '#1a2035' } },
+    crosshair: { mode: 0 },
+    rightPriceScale: { borderColor: '#1e293b', scaleMargins: { top: 0.1, bottom: 0.1 } },
+    timeScale: { borderColor: '#1e293b', timeVisible: true },
+    handleScroll: { mouseWheel: true, pressedMouseMove: true },
+    handleScale: { mouseWheel: true, pinch: true },
+  });
+
+  const isShort = pos.direction === 'SHORT';
+  const upColor = isShort ? '#ef4444' : '#22c55e';
+  const downColor = isShort ? '#22c55e' : '#ef4444';
+
+  const candleSeries = chart.addCandlestickSeries({
+    upColor, downColor,
+    borderUpColor: upColor, borderDownColor: downColor,
+    wickUpColor: upColor, wickDownColor: downColor,
+  });
+  candleSeries.setData(candles);
+
+  // Entry line
+  candleSeries.createPriceLine({
+    price: pos.entry,
+    color: '#3b82f6',
+    lineWidth: 2,
+    lineStyle: 0,
+    axisLabelVisible: true,
+    title: 'ENTRY',
+  });
+
+  // SL line
+  candleSeries.createPriceLine({
+    price: pos.sl,
+    color: '#ef4444',
+    lineWidth: 1,
+    lineStyle: 2,
+    axisLabelVisible: true,
+    title: 'SL',
+  });
+
+  // TP line
+  candleSeries.createPriceLine({
+    price: pos.tp,
+    color: '#22c55e',
+    lineWidth: 1,
+    lineStyle: 2,
+    axisLabelVisible: true,
+    title: 'TP',
+  });
+
+  // DSL floor line
+  const floor = pos.dsl?.floorPrice || pos.dsl?.tierFloorPrice;
+  if (floor) {
+    candleSeries.createPriceLine({
+      price: floor,
+      color: '#f59e0b',
+      lineWidth: 1,
+      lineStyle: 1,
+      axisLabelVisible: true,
+      title: 'DSL FLOOR',
+    });
+  }
+
+  // Entry marker
+  const entryTime = candles.find(c => c.time >= Math.floor(new Date(pos.openedAt).getTime() / 1000));
+  if (entryTime) {
+    candleSeries.setMarkers([{
+      time: entryTime.time,
+      position: pos.direction === 'LONG' ? 'belowBar' : 'aboveBar',
+      color: '#3b82f6',
+      shape: pos.direction === 'LONG' ? 'arrowUp' : 'arrowDown',
+      text: `${pos.direction} @ ${fmt(pos.entry, 4)}`,
+    }]);
+  }
+
+  chart.timeScale().fitContent();
+  charts[containerId] = chart;
+
+  new ResizeObserver(() => {
+    chart.applyOptions({ width: container.clientWidth, height: container.clientHeight || 340 });
+  }).observe(container);
+}
+
+function renderPortfolio(data) {
+  const { positions, strategy } = data;
+  const totalMargin = positions.reduce((s, p) => s + (p.margin || 0), 0);
+  const totalNotional = positions.reduce((s, p) => s + (p.notional || 0), 0);
+  const balance = strategy?.currentBalance || 1044.72;
+  const initial = strategy?.initialBudget || 1230;
+  const target = strategy?.target || 2500;
+  const drawdown = balance - initial;
+  const progress = ((balance - initial) / (target - initial)) * 100;
+
+  document.getElementById('portfolio-bar').innerHTML = `
+    <div class="portfolio-stat">
+      <span class="label">Balance</span>
+      <span class="value">${fmtUSD(balance)}</span>
+    </div>
+    <div class="portfolio-stat">
+      <span class="label">Drawdown</span>
+      <span class="value ${pnlClass(drawdown)}">${fmtUSD(drawdown)}</span>
+    </div>
+    <div class="portfolio-stat">
+      <span class="label">Margin Used</span>
+      <span class="value">${fmtUSD(totalMargin)}</span>
+    </div>
+    <div class="portfolio-stat">
+      <span class="label">Notional</span>
+      <span class="value">${fmtUSD(totalNotional)}</span>
+    </div>
+    <div class="portfolio-stat">
+      <span class="label">Positions</span>
+      <span class="value">${positions.length} / ${strategy?.rules?.maxConcurrentPositions || 3}</span>
+    </div>
+    <div class="portfolio-stat">
+      <span class="label">Target $${target}</span>
+      <div class="progress-bar" style="width:120px;margin-top:6px">
+        <div class="progress-fill" style="width:${Math.max(0, Math.min(100, progress))}%;background:${progress >= 0 ? '#3b82f6' : '#ef4444'}"></div>
+      </div>
+    </div>
+  `;
+}
+
+async function renderPositions(data) {
+  const { positions } = data;
+  const container = document.getElementById('positions');
+
+  if (!positions.length) {
+    container.innerHTML = '<div class="empty-state"><h2>No Open Positions</h2><p>Waiting for v5 scanner signals...</p></div>';
+    return;
+  }
+
+  // Fetch live prices
+  const prices = {};
+  for (const p of positions) {
+    try { prices[p.asset] = await fetchMidPrice(p.asset); } catch { prices[p.asset] = p.entry; }
+  }
+
+  container.innerHTML = positions.map((p, i) => {
+    const price = prices[p.asset] || p.entry;
+    const dir = p.direction === 'LONG' ? 1 : -1;
+    const pnlPct = ((price - p.entry) / p.entry) * 100 * dir * p.leverage;
+    const pnlUsd = (p.margin * pnlPct / 100);
+    const dsl = p.dsl || {};
+    const slDist = Math.abs((p.sl - price) / price * 100);
+    const tpDist = Math.abs((p.tp - price) / price * 100);
+    const rr = tpDist / (slDist || 1);
+    const tierName = dsl.currentTierIndex >= 0 ? `Tier ${dsl.currentTierIndex + 1}` : 'None';
+
+    return `
+    <div class="position-card">
+      <div class="position-header">
+        <div class="position-title">
+          <h2>${p.asset}</h2>
+          <span class="badge ${p.direction.toLowerCase()}">${p.direction} ${p.leverage}x</span>
+          <span class="dsl-phase ${(dsl.phase || 'accumulate').toLowerCase()}">${dsl.phase || 'accumulate'}</span>
+        </div>
+        <div>
+          <span class="score-badge">v5 Score: <strong>${p.scanScore || '—'}</strong></span>
+          &nbsp;·&nbsp;
+          <span style="color:#5a6478">${timeSince(p.openedAt)} ago</span>
+        </div>
+      </div>
+      <div class="position-body">
+        <div class="chart-container">
+          <div class="chart" id="chart-${i}"></div>
+        </div>
+        <div class="position-details">
+          <div class="detail-row">
+            <span class="label">Current Price</span>
+            <span class="value">${fmt(price, price < 1 ? 4 : 2)}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Unrealized PnL</span>
+            <span class="value ${pnlClass(pnlUsd)}">${pnlUsd >= 0 ? '+' : ''}${fmtUSD(pnlUsd)} (${pnlPct >= 0 ? '+' : ''}${fmt(pnlPct, 1)}%)</span>
+          </div>
+
+          <div class="detail-section">
+            <div class="detail-section-title">Levels</div>
+            <div class="detail-row">
+              <span class="label"><span class="level-indicator"><span class="level-dot entry"></span> Entry</span></span>
+              <span class="value">${fmt(p.entry, p.entry < 1 ? 4 : 2)}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label"><span class="level-indicator"><span class="level-dot sl"></span> Stop Loss</span></span>
+              <span class="value">${fmt(p.sl, p.sl < 1 ? 4 : 2)} <span style="color:#5a6478">(${fmt(slDist, 1)}% away)</span></span>
+            </div>
+            <div class="detail-row">
+              <span class="label"><span class="level-indicator"><span class="level-dot tp"></span> Take Profit</span></span>
+              <span class="value">${fmt(p.tp, p.tp < 1 ? 4 : 2)} <span style="color:#5a6478">(${fmt(tpDist, 1)}% away)</span></span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Risk:Reward</span>
+              <span class="value">1:${fmt(rr, 1)}</span>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <div class="detail-section-title">DSL State</div>
+            <div class="detail-row">
+              <span class="label"><span class="level-indicator"><span class="level-dot floor"></span> DSL Floor</span></span>
+              <span class="value">${fmt(dsl.floorPrice || dsl.tierFloorPrice, (dsl.floorPrice||0) < 1 ? 4 : 2)}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">High Water</span>
+              <span class="value">${fmt(dsl.highWaterPrice, (dsl.highWaterPrice||0) < 1 ? 4 : 2)}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Tier</span>
+              <span class="value">${tierName}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Breaches</span>
+              <span class="value">${dsl.currentBreachCount || 0} / ${dsl.phase === 'accumulate' ? 3 : 2}</span>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <div class="detail-section-title">Position</div>
+            <div class="detail-row">
+              <span class="label">Margin</span>
+              <span class="value">${fmtUSD(p.margin)}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Size</span>
+              <span class="value">${fmt(p.size, 2)} ${p.asset}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Notional</span>
+              <span class="value">${fmtUSD(p.size * price)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Render charts
+  for (let i = 0; i < positions.length; i++) {
+    const p = positions[i];
+    try {
+      const candles = await fetchCandles(p.asset, '15m', 200);
+      createChart(`chart-${i}`, candles, p);
+    } catch (e) {
+      console.error(`Chart error for ${p.asset}:`, e);
+    }
+  }
+}
+
+
+// Embedded position data (snapshot)
+const EMBEDDED_DATA = {"positions": [{"asset": "HYPE", "direction": "LONG", "entry": 30.1196, "margin": 313, "leverage": 5, "size": 51.95, "notional": 1564.86, "sl": 27.113, "tp": 36.15, "openedAt": "2026-02-20T16:59:43Z", "scanScore": 223, "scanVersion": "v5", "dsl": {"asset": "HYPE", "direction": "LONG", "entryPrice": 30.1196, "margin": 313, "leverage": 5, "size": 51.95, "active": true, "phase": "accumulate", "trailingActivated": false, "highWaterPrice": 30.1196, "floorPrice": 29.6678, "tierFloorPrice": null, "currentTierIndex": -1, "currentBreachCount": 0, "breachDecay": "soft", "closeRetries": 2, "closeRetryDelaySec": 3, "consecutiveFetchFailures": 0, "pendingClose": false, "lastCheck": "2026-02-20T20:27:51Z", "lastPrice": 29.9585, "strategyId": "e5682bc7-ce13-405d-9943-9e2abeff7998", "strategyWallet": "0xee2cf153cf9abeb446d08483f01daf928cb50acf", "openedAt": "2026-02-20T16:59:43Z", "tiers": [{"triggerPct": 10, "lockPct": 5}, {"triggerPct": 20, "lockPct": 14}, {"triggerPct": 30, "lockPct": 22, "retrace": 0.012}, {"triggerPct": 50, "lockPct": 40, "retrace": 0.01}, {"triggerPct": 75, "lockPct": 60, "retrace": 0.008}, {"triggerPct": 100, "lockPct": 80, "retrace": 0.006}], "phase1": {"retraceThreshold": 0.03, "consecutiveBreachesRequired": 3, "absoluteFloor": 27.113}, "phase2TriggerTier": 1, "phase2": {"retraceThreshold": 0.015, "consecutiveBreachesRequired": 2}, "wallet": "0xee2cf153cf9abeb446d08483f01daf928cb50acf"}}, {"asset": "SOL", "direction": "LONG", "entry": 84.453, "margin": 313, "leverage": 5, "size": 18.53, "notional": 1564.55, "sl": 75.996, "tp": 101.33, "openedAt": "2026-02-20T17:58:31Z", "scanScore": 229, "scanVersion": "v5", "dsl": {"asset": "SOL", "direction": "LONG", "entryPrice": 84.453, "margin": 313, "leverage": 5, "size": 18.53, "active": true, "phase": "accumulate", "trailingActivated": false, "highWaterPrice": 85.2855, "floorPrice": 84.0062, "tierFloorPrice": null, "currentTierIndex": -1, "currentBreachCount": 0, "breachDecay": "soft", "closeRetries": 2, "closeRetryDelaySec": 3, "consecutiveFetchFailures": 0, "pendingClose": false, "lastCheck": "2026-02-20T20:27:52Z", "lastPrice": 84.5725, "strategyId": "e5682bc7-ce13-405d-9943-9e2abeff7998", "strategyWallet": "0xee2cf153cf9abeb446d08483f01daf928cb50acf", "openedAt": "2026-02-20T17:58:31Z", "tiers": [{"triggerPct": 10, "lockPct": 5}, {"triggerPct": 20, "lockPct": 14}, {"triggerPct": 30, "lockPct": 22, "retrace": 0.012}, {"triggerPct": 50, "lockPct": 40, "retrace": 0.01}, {"triggerPct": 75, "lockPct": 60, "retrace": 0.008}, {"triggerPct": 100, "lockPct": 80, "retrace": 0.006}], "phase1": {"retraceThreshold": 0.03, "consecutiveBreachesRequired": 3, "absoluteFloor": 75.996}, "phase2TriggerTier": 1, "phase2": {"retraceThreshold": 0.015, "consecutiveBreachesRequired": 2}, "wallet": "0xee2cf153cf9abeb446d08483f01daf928cb50acf"}}, {"asset": "XRP", "direction": "SHORT", "entry": 1.4231, "margin": 313, "leverage": 5, "size": 1100, "notional": 1565.41, "sl": 1.5655, "tp": 1.1385, "openedAt": "2026-02-20T19:58:21Z", "scanScore": 202, "scanVersion": "v5", "dsl": {"asset": "XRP", "direction": "SHORT", "entryPrice": 1.4231, "margin": 313, "leverage": 5, "size": 1100, "active": true, "phase": "accumulate", "trailingActivated": false, "highWaterPrice": 1.41865, "floorPrice": 1.4399, "tierFloorPrice": null, "currentTierIndex": -1, "currentBreachCount": 0, "breachDecay": "soft", "closeRetries": 2, "closeRetryDelaySec": 3, "consecutiveFetchFailures": 0, "pendingClose": false, "lastCheck": "2026-02-20T20:27:52Z", "lastPrice": 1.41865, "strategyId": "e5682bc7-ce13-405d-9943-9e2abeff7998", "strategyWallet": "0xee2cf153cf9abeb446d08483f01daf928cb50acf", "openedAt": "2026-02-20T19:58:21Z", "tiers": [{"triggerPct": 10, "lockPct": 5}, {"triggerPct": 20, "lockPct": 14}, {"triggerPct": 30, "lockPct": 22, "retrace": 0.012}, {"triggerPct": 50, "lockPct": 40, "retrace": 0.01}, {"triggerPct": 75, "lockPct": 60, "retrace": 0.008}, {"triggerPct": 100, "lockPct": 80, "retrace": 0.006}], "phase1": {"retraceThreshold": 0.03, "consecutiveBreachesRequired": 3, "absoluteFloor": 1.5655}, "phase2TriggerTier": 1, "phase2": {"retraceThreshold": 0.015, "consecutiveBreachesRequired": 2}, "wallet": "0xee2cf153cf9abeb446d08483f01daf928cb50acf"}}], "strategy": {"strategyId": "e5682bc7-ce13-405d-9943-9e2abeff7998", "wallet": "0xee2cf153cf9abeb446d08483f01daf928cb50acf", "initialBudget": 1230, "target": 2500, "startDate": "2026-02-19", "deadline": "2026-02-22", "riskProfile": "aggressive", "rules": {"maxConcurrentPositions": 3, "maxSingleAllocation": 615, "maxLeverage": 10, "dailyLossLimit": -185, "totalDrawdownCap": -430, "minScannerScore": 200, "minRiskReward": 1.5, "cooldownAfterConsecutiveLosses": 2, "cooldownMinutes": 5, "autonomousExecution": true, "maxNetExposurePct": 200, "flipRules": {"enabled": false, "minConviction": 8, "checkIntervalMin": 5, "requireScannerConfirm": true}, "schedule": {"highActivity": {"hours": [13, 14, 15, 16, 17, 18, 19, 20], "scanInterval": 10}, "mediumActivity": {"hours": [6, 7, 8, 9, 10, 11, 12, 21, 22], "scanInterval": 15}, "lowActivity": {"hours": [0, 1, 2, 3, 4, 5, 23], "scanInterval": 30}}, "tradeJournaling": true, "scannerVersion": "v5", "hourlyTrendGate": true}, "positionSizingStep": 1, "consecutiveLosses": 7, "trades": [{"asset": "XRP", "direction": "LONG", "leverage": 4, "entry": 1.4208, "margin": 185, "size": 521, "openedAt": "2026-02-20T02:22:00Z", "score": 183, "status": "closed", "closedAt": "2026-02-20T04:56:12Z", "closePrice": 1.4078, "pnl": -6.77}, {"asset": "HYPE", "direction": "LONG", "leverage": 4, "entry": 29.433, "margin": 230, "size": 31.26, "openedAt": "2026-02-20T03:24:51Z", "score": 196, "status": "open"}, {"asset": "ETH", "direction": "SHORT", "leverage": 6, "entry": 1936.9, "margin": 307.5, "size": 0.9525, "openedAt": "2026-02-20T04:25:22Z", "score": 223, "status": "open"}, {"asset": "ZRO", "direction": "SHORT", "leverage": 5, "entry": 1.46526, "margin": 307.5, "size": 1049.1, "openedAt": "2026-02-20T04:57:43Z", "score": 206, "status": "open"}, {"asset": "ETH", "direction": "SHORT", "leverage": 6, "entry": 1936.9, "margin": 310.5, "status": "closed", "closedAt": "2026-02-20T06:07:25Z", "closePrice": 1956.4, "pnl": -18.6, "closeReason": "SM flip conviction 4"}, {"asset": "ETH", "direction": "LONG", "leverage": 6, "entry": 1956.0, "margin": 308, "size": 0.9448, "openedAt": "2026-02-20T06:07:46Z", "score": 0, "scoreNote": "SM flip trade, not scanner-driven", "status": "open"}, {"asset": "XRP", "direction": "SHORT", "leverage": 3, "entry": 1.4158, "margin": 130, "size": 275, "openedAt": "2026-02-20T06:27:00Z", "score": 191, "scoreNote": "v4 score 191, streak 4, no cross-confirm \u2192 70% size", "status": "open"}, {"asset": "HYPE", "direction": "LONG", "leverage": 4, "entry": 29.433, "margin": 230, "status": "closed", "closedAt": "2026-02-20T06:57:00Z", "closePrice": 29.321, "pnl": -3.5, "closeReason": "SM flip conviction 4"}, {"asset": "HYPE", "direction": "SHORT", "leverage": 4, "entry": 29.322, "margin": 185, "size": 25.24, "openedAt": "2026-02-20T06:57:10Z", "score": 0, "scoreNote": "SM flip trade", "status": "open"}, {"asset": "SOL", "direction": "LONG", "leverage": 5, "entry": 83.591, "margin": 185, "size": 11.07, "openedAt": "2026-02-20T08:57:00Z", "score": 206, "status": "open"}, {"asset": "HYPE", "direction": "SHORT", "leverage": 4, "entry": 29.322, "margin": 185, "status": "closed", "closedAt": "2026-02-20T10:57:00Z", "closePrice": 29.488, "pnl": -4.19, "closeReason": "SM flip persistent conv4 x2 heartbeats"}, {"asset": "HYPE", "direction": "LONG", "leverage": 4, "entry": 29.482, "margin": 185, "size": 25.1, "openedAt": "2026-02-20T10:57:10Z", "score": 0, "scoreNote": "SM flip trade", "status": "open"}, {"asset": "ETH", "direction": "LONG", "leverage": 6, "entry": 1956.0, "margin": 308, "status": "closed", "closedAt": "2026-02-20T11:57:00Z", "closePrice": 1946.2, "pnl": -9.26, "closeReason": "SM flip SHORT conv4"}, {"asset": "ETH", "direction": "SHORT", "leverage": 6, "entry": 1946.5, "margin": 185, "size": 0.5702, "openedAt": "2026-02-20T11:57:10Z", "score": 0, "scoreNote": "SM flip trade", "status": "open"}, {"asset": "SOL", "direction": "LONG", "leverage": 5, "entry": 83.591, "margin": 185, "status": "closed", "closedAt": "2026-02-20T13:27:00Z", "closePrice": 82.822, "pnl": -8.51, "closeReason": "SM flip SHORT conv4"}, {"asset": "SOL", "direction": "SHORT", "leverage": 5, "entry": 82.869, "margin": 185, "size": 11.16, "openedAt": "2026-02-20T13:27:10Z", "score": 0, "scoreNote": "SM flip", "status": "open"}, {"asset": "HYPE", "direction": "LONG", "leverage": 4, "entry": 29.482, "margin": 185, "status": "closed", "closedAt": "2026-02-20T13:27:00Z", "closePrice": 29.168, "pnl": -7.88, "closeReason": "SM flip SHORT conv4"}, {"asset": "HYPE", "direction": "SHORT", "leverage": 4, "entry": 29.176, "margin": 185, "size": 25.37, "openedAt": "2026-02-20T13:27:10Z", "score": 0, "scoreNote": "SM flip", "status": "open"}, {"asset": "ZRO", "direction": "SHORT", "leverage": 5, "entry": 1.46526, "margin": 312, "status": "closed", "closedAt": "2026-02-20T14:56:44Z", "closePrice": 1.5242, "pnl": -61.83, "closeReason": "DSL breach 2/2 - position already closed/liquidated on-chain"}, {"asset": "ETH", "direction": "SHORT", "leverage": 6, "entry": 1946.5, "margin": 185, "status": "closed", "closedAt": "2026-02-20T15:58:56Z", "closePrice": 1962.1, "pnl": -8.9, "closeReason": "SM flip LONG conv4"}, {"asset": "ETH", "direction": "LONG", "leverage": 6, "entry": 1963.4, "margin": 185, "size": 0.5651, "openedAt": "2026-02-20T15:58:56Z", "score": 0, "scoreNote": "SM flip", "status": "open"}, {"asset": "HYPE", "direction": "SHORT", "leverage": 4, "entry": 29.176, "margin": 185, "status": "closed", "closedAt": "2026-02-20T15:58:56Z", "closePrice": 29.841, "pnl": -16.87, "closeReason": "SM flip LONG conv4 + breach"}, {"asset": "HYPE", "direction": "LONG", "leverage": 4, "entry": 29.856, "margin": 185, "size": 24.78, "openedAt": "2026-02-20T15:58:56Z", "score": 0, "scoreNote": "SM flip", "status": "open"}], "activeTrades": [{"asset": "HYPE", "direction": "LONG", "leverage": 4, "entry": 29.433, "margin": 230, "size": 31.26, "openedAt": "2026-02-20T03:24:51Z", "score": 196}, {"asset": "ETH", "direction": "SHORT", "leverage": 6, "entry": 1936.9, "margin": 307.5, "size": 0.9525, "openedAt": "2026-02-20T04:25:22Z", "score": 223}, {"asset": "ZRO", "direction": "SHORT", "leverage": 5, "entry": 1.46526, "margin": 307.5, "size": 1049.1, "openedAt": "2026-02-20T04:57:43Z", "score": 206}], "dailyPnL": {}, "totalRealizedPnL": -6.77, "currentSizingStep": 1, "currentBalance": 1044.72}};
+
+async function fetchPositions() {
+  try {
+    const res = await fetch('/api/positions');
+    if (res.ok) return await res.json();
+  } catch {}
+  return EMBEDDED_DATA;
+}
+
+async function refresh() {
+  const spinner = document.getElementById('spinner');
+  spinner.classList.add('active');
+  try {
+    const data = await fetchPositions();
+    renderPortfolio(data);
+    await renderPositions(data);
+    document.getElementById('last-update').textContent = 'Updated ' + new Date().toLocaleTimeString();
+  } catch (e) {
+    console.error('Refresh error:', e);
+    document.getElementById('last-update').textContent = 'Error refreshing';
+  }
+  spinner.classList.remove('active');
+}
+
+refresh();
+setInterval(refresh, 30000);
+</script>
+</body>
+</html>

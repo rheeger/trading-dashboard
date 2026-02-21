@@ -3,48 +3,52 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trading Dashboard</title>
+<title>⚡ Trading Dashboard</title>
+<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 <style>
   :root {
     --bg: #0d1117;
     --card: #161b22;
     --border: #30363d;
     --text: #e6edf3;
-    --text-dim: #8b949e;
+    --dim: #8b949e;
     --positive: #00e676;
     --negative: #ff5252;
     --accent: #58a6ff;
+    --long: #00e676;
+    --short: #ff5252;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
     background: var(--bg);
     color: var(--text);
     padding: 20px;
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
   }
+  .dim { color: var(--dim); }
+  .positive { color: var(--positive); }
+  .negative { color: var(--negative); }
+
+  /* Header */
   .header {
-    text-align: center;
-    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
     padding-bottom: 16px;
     border-bottom: 1px solid var(--border);
   }
-  .header h1 {
-    font-size: 1.4em;
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
-  .header .updated {
-    color: var(--text-dim);
-    font-size: 0.8em;
-  }
-  
+  .header h1 { font-size: 1.3em; }
+  .header .meta { color: var(--dim); font-size: 0.8em; text-align: right; }
+
+  /* Summary cards */
   .summary {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 12px;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
   .summary-card {
     background: var(--card);
@@ -54,8 +58,8 @@
     text-align: center;
   }
   .summary-card .label {
-    color: var(--text-dim);
-    font-size: 0.75em;
+    color: var(--dim);
+    font-size: 0.7em;
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
@@ -64,73 +68,136 @@
     font-weight: 700;
     margin-top: 4px;
   }
-  
-  .position-card {
+
+  /* Progress bar */
+  .progress-container {
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 16px;
+    padding: 14px;
+    margin-bottom: 20px;
   }
-  .pos-header {
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.85em;
+  }
+  .progress-bar {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--positive));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+
+  /* Positions table */
+  .table-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 24px;
+  }
+  .table-card h3 {
+    padding: 14px 16px 0;
+    font-size: 0.95em;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85em;
+  }
+  th {
+    text-align: left;
+    padding: 10px 12px;
+    color: var(--dim);
+    font-weight: 500;
+    font-size: 0.75em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover { background: rgba(88, 166, 255, 0.04); }
+  .asset-cell { font-weight: 600; }
+
+  /* Direction badges */
+  .dir-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: 600;
+  }
+  .dir-badge.long { background: rgba(0, 230, 118, 0.15); color: var(--long); }
+  .dir-badge.short { background: rgba(255, 82, 82, 0.15); color: var(--short); }
+
+  /* Chart cards */
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .chart-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 14px;
-    padding-bottom: 10px;
+    padding: 14px 16px;
     border-bottom: 1px solid var(--border);
   }
-  .pos-title {
+  .chart-title {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
   }
-  .asset-name {
-    font-size: 1.2em;
-    font-weight: 700;
-  }
-  .leverage {
-    color: var(--text-dim);
-    font-size: 0.85em;
-  }
-  .pos-pnl {
-    font-size: 1.1em;
-    font-weight: 700;
-  }
-  .positive { color: var(--positive); }
-  .negative { color: var(--negative); }
-  
-  .pos-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-  .stat {
+  .asset-name { font-size: 1.15em; font-weight: 700; }
+  .chart-pnl { font-size: 1.1em; font-weight: 700; }
+  .chart-meta {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    gap: 16px;
+    padding: 10px 16px;
+    font-size: 0.8em;
+    color: var(--dim);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
   }
-  .stat-label {
-    color: var(--text-dim);
-    font-size: 0.7em;
+  .chart-meta strong { color: var(--text); }
+  .tv-chart {
+    height: 420px;
+    width: 100%;
+  }
+
+  /* Tier progress */
+  .tier-section {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .tier-label {
+    color: var(--dim);
+    font-size: 0.75em;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-  }
-  .stat-value {
-    font-size: 0.9em;
-    font-weight: 500;
-  }
-  
-  .tier-section {
-    margin-top: 8px;
+    margin-bottom: 8px;
   }
   .tier-track {
     position: relative;
     height: 8px;
     background: var(--border);
     border-radius: 4px;
-    margin: 8px 0 16px 0;
+    margin-bottom: 18px;
   }
   .tier-dot {
     position: absolute;
@@ -163,316 +230,347 @@
     position: relative;
     height: 16px;
     font-size: 0.65em;
-    color: var(--text-dim);
+    color: var(--dim);
   }
   .tier-labels span {
     position: absolute;
     transform: translateX(-50%);
   }
-  
-  .phase-explainer {
+
+  /* Phase explainer */
+  .explainer {
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 16px;
     margin-top: 24px;
   }
-  .phase-explainer h3 {
-    margin-bottom: 12px;
-    font-size: 1em;
-  }
-  .phase-explainer p {
-    color: var(--text-dim);
-    font-size: 0.85em;
-    line-height: 1.5;
+  .explainer h3 { margin-bottom: 12px; font-size: 0.95em; }
+  .explainer p {
+    color: var(--dim);
+    font-size: 0.82em;
+    line-height: 1.6;
     margin-bottom: 8px;
   }
-  .phase-explainer .phase-name {
-    color: var(--text);
-    font-weight: 600;
+  .explainer .hl { color: var(--text); font-weight: 600; }
+
+  /* Recipes link */
+  .recipes-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin-top: 16px;
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.85em;
+    transition: border-color 0.2s;
   }
-  
+  .recipes-link:hover { border-color: var(--accent); }
+
   .footer {
     text-align: center;
-    color: var(--text-dim);
+    color: var(--dim);
     font-size: 0.7em;
     margin-top: 24px;
     padding-top: 16px;
     border-top: 1px solid var(--border);
   }
+
+  @media (max-width: 768px) {
+    body { padding: 12px; }
+    .tv-chart { height: 320px; }
+    .chart-meta { gap: 10px; }
+    .summary { grid-template-columns: repeat(2, 1fr); }
+  }
 </style>
 </head>
 <body>
-  <div class="header">
-    <h1>⚡ Trading Dashboard</h1>
-    <div class="updated">Last updated: Feb 21, 2026 04:59 UTC</div>
+
+<div class="header">
+  <h1>⚡ Trading Dashboard</h1>
+  <div class="meta">
+    Updated: Feb 21, 2026 05:21 UTC<br>
+    Strategy: e5682bc7…
   </div>
-  
-  <div class="summary">
-    <div class="summary-card">
-      <div class="label">Net uPnL</div>
-      <div class="value positive">$+3.34</div>
-    </div>
-    <div class="summary-card">
-      <div class="label">Positions</div>
-      <div class="value">3</div>
-    </div>
-    <div class="summary-card">
-      <div class="label">Initial</div>
-      <div class="value">$1,230</div>
-    </div>
-    <div class="summary-card">
-      <div class="label">Target</div>
-      <div class="value">$2,500</div>
-    </div>
-    <div class="summary-card">
-      <div class="label">Deadline</div>
-      <div class="value">2026-02-22</div>
-    </div>
+</div>
+
+<div class="summary">
+  <div class="summary-card">
+    <div class="label">Net uPnL</div>
+    <div class="value negative">$-0.12</div>
   </div>
-  
-  
-    <div class="position-card">
-      <div class="pos-header">
-        <div class="pos-title">
-          <span class="asset-name">HYPE</span>
-          <span style="color:#00e676;font-weight:700">LONG</span>
-          <span class="leverage">5×</span>
+  <div class="summary-card">
+    <div class="label">Positions</div>
+    <div class="value">3</div>
+  </div>
+  <div class="summary-card">
+    <div class="label">Margin Deployed</div>
+    <div class="value">$939</div>
+  </div>
+  <div class="summary-card">
+    <div class="label">Balance</div>
+    <div class="value">$1,230</div>
+  </div>
+  <div class="summary-card">
+    <div class="label">Target</div>
+    <div class="value">$2,500</div>
+  </div>
+  <div class="summary-card">
+    <div class="label">Deadline</div>
+    <div class="value">2026-02-22</div>
+  </div>
+</div>
+
+<div class="progress-container">
+  <div class="progress-header">
+    <span>Progress to $2,500</span>
+    <span class="dim">$1,230 / $2,500 (49.2%)</span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" style="width: 49.2%"></div>
+  </div>
+</div>
+
+<div class="table-card">
+  <h3>📊 Active Positions</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Asset</th>
+        <th>Direction</th>
+        <th>Entry</th>
+        <th>Mark</th>
+        <th>uPnL</th>
+        <th>Phase</th>
+        <th>Tier</th>
+        <th>Locked</th>
+        <th>Breaches</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+    <tr>
+      <td class="asset-cell"><strong>HYPE</strong></td>
+      <td><span class="dir-badge long">LONG</span> <span class="dim">5×</span></td>
+      <td>$30.1196</td>
+      <td>$30.2285</td>
+      <td class="positive">+$5.66 <span class="dim">(+1.8%)</span></td>
+      <td>🟢 Protect</td>
+      <td>None</td>
+      <td>$0.00</td>
+      <td>0/2</td>
+    </tr>
+    <tr>
+      <td class="asset-cell"><strong>SOL</strong></td>
+      <td><span class="dir-badge long">LONG</span> <span class="dim">5×</span></td>
+      <td>$84.4530</td>
+      <td>$84.4235</td>
+      <td class="negative">$-0.55 <span class="dim">(-0.2%)</span></td>
+      <td>🟢 Protect</td>
+      <td>None</td>
+      <td>$0.00</td>
+      <td>0/2</td>
+    </tr>
+    <tr>
+      <td class="asset-cell"><strong>XRP</strong></td>
+      <td><span class="dir-badge short">SHORT</span> <span class="dim">5×</span></td>
+      <td>$1.4231</td>
+      <td>$1.4279</td>
+      <td class="negative">$-5.23 <span class="dim">(-1.7%)</span></td>
+      <td>🟢 Protect</td>
+      <td>None</td>
+      <td>$0.00</td>
+      <td>0/2</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">
+          <span class="asset-name">HYPE</span> <span class="dir-badge long">LONG</span> <span class="dim">5×</span>
         </div>
-        <div class="pos-pnl positive">
-          +10.23 (+3.3%)
+        <div class="chart-pnl positive">
+          +$5.66 (+1.8%)
         </div>
       </div>
-      
-      <div class="pos-grid">
-        <div class="stat">
-          <span class="stat-label">Entry</span>
-          <span class="stat-value">$30.1196</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Mark</span>
-          <span class="stat-value">$30.3165</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Phase</span>
-          <span class="stat-value">🟢 Protect</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Tier</span>
-          <span class="stat-value">None</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Floor</span>
-          <span class="stat-value">$30.0144</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Tier Floor</span>
-          <span class="stat-value">—</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">High Water</span>
-          <span class="stat-value">$30.4715</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Locked Profit</span>
-          <span class="stat-value">$0.00</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Velocity</span>
-          <span class="stat-value negative">-0.0375</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Breaches</span>
-          <span class="stat-value">0/2</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">SL / TP</span>
-          <span class="stat-value">$27.1130 / $36.1500</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Next Tier In</span>
-          <span class="stat-value">6.7%</span>
-        </div>
+      <div class="chart-meta">
+        <span>Entry: <strong>$30.1196</strong></span>
+        <span>SL: <strong>$27.1130</strong></span>
+        <span>TP: <strong>$36.1500</strong></span>
+        <span>Floor: <strong>$30.0144</strong></span>
+        <span>HW: <strong>$30.4715</strong></span>
       </div>
-      
+      <div class="tv-chart" id="chart-hype"></div>
+      <script>
+        new TradingView.widget({
+          "container_id": "chart-hype",
+          "autosize": true,
+          "symbol": "BYBIT:HYPEUSDT.P",
+          "interval": "15",
+          "timezone": "Etc/UTC",
+          "theme": "dark",
+          "style": "1",
+          "locale": "en",
+          "toolbar_bg": "#161b22",
+          "enable_publishing": false,
+          "hide_top_toolbar": false,
+          "hide_legend": false,
+          "save_image": false,
+          "backgroundColor": "#0d1117",
+          "gridColor": "#1c2128",
+          "hide_volume": false,
+          "studies": ["RSI@tv-basicstudies", "BB@tv-basicstudies"]
+        });
+      </script>
       <div class="tier-section">
-        <span class="stat-label">Tier Progress</span>
-        <div class="tier-track"><div class="tier-dot" style="left:10%" title="Tier 1: 10% → lock 5%"></div><div class="tier-dot" style="left:20%" title="Tier 2: 20% → lock 14%"></div><div class="tier-dot" style="left:30%" title="Tier 3: 30% → lock 22%"></div><div class="tier-dot" style="left:50%" title="Tier 4: 50% → lock 40%"></div><div class="tier-dot" style="left:75%" title="Tier 5: 75% → lock 60%"></div><div class="tier-dot" style="left:100%" title="Tier 6: 100% → lock 80%"></div><div class="current-marker" style="left:3.27%"></div></div>
+        <div class="tier-label">Tier Progress — next tier in 8.2%</div>
+        <div class="tier-track">
+          <div class="tier-dot " style="left:10%" title="Tier 1: +10% → lock +5%"></div><div class="tier-dot " style="left:20%" title="Tier 2: +20% → lock +14%"></div><div class="tier-dot " style="left:30%" title="Tier 3: +30% → lock +22%"></div><div class="tier-dot " style="left:50%" title="Tier 4: +50% → lock +40%"></div><div class="tier-dot " style="left:75%" title="Tier 5: +75% → lock +60%"></div><div class="tier-dot " style="left:100%" title="Tier 6: +100% → lock +80%"></div>
+          <div class="current-marker" style="left:1.81%"></div>
+        </div>
         <div class="tier-labels">
           <span style="left:10%">10%</span><span style="left:20%">20%</span><span style="left:30%">30%</span><span style="left:50%">50%</span><span style="left:75%">75%</span><span style="left:100%">100%</span>
         </div>
       </div>
     </div>
     
-    <div class="position-card">
-      <div class="pos-header">
-        <div class="pos-title">
-          <span class="asset-name">SOL</span>
-          <span style="color:#00e676;font-weight:700">LONG</span>
-          <span class="leverage">5×</span>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">
+          <span class="asset-name">SOL</span> <span class="dir-badge long">LONG</span> <span class="dim">5×</span>
         </div>
-        <div class="pos-pnl negative">
-          -1.77 (-0.6%)
+        <div class="chart-pnl negative">
+          $-0.55 (-0.2%)
         </div>
       </div>
-      
-      <div class="pos-grid">
-        <div class="stat">
-          <span class="stat-label">Entry</span>
-          <span class="stat-value">$84.4530</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Mark</span>
-          <span class="stat-value">$84.3575</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Phase</span>
-          <span class="stat-value">🟢 Protect</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Tier</span>
-          <span class="stat-value">None</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Floor</span>
-          <span class="stat-value">$84.0062</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Tier Floor</span>
-          <span class="stat-value">—</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">High Water</span>
-          <span class="stat-value">$85.2855</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Locked Profit</span>
-          <span class="stat-value">$0.00</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Velocity</span>
-          <span class="stat-value negative">-0.0557</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Breaches</span>
-          <span class="stat-value">0/2</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">SL / TP</span>
-          <span class="stat-value">$75.9960 / $101.3300</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Next Tier In</span>
-          <span class="stat-value">10.6%</span>
-        </div>
+      <div class="chart-meta">
+        <span>Entry: <strong>$84.4530</strong></span>
+        <span>SL: <strong>$75.9960</strong></span>
+        <span>TP: <strong>$101.3300</strong></span>
+        <span>Floor: <strong>$84.0062</strong></span>
+        <span>HW: <strong>$85.2855</strong></span>
       </div>
-      
+      <div class="tv-chart" id="chart-sol"></div>
+      <script>
+        new TradingView.widget({
+          "container_id": "chart-sol",
+          "autosize": true,
+          "symbol": "BINANCE:SOLUSDT.P",
+          "interval": "15",
+          "timezone": "Etc/UTC",
+          "theme": "dark",
+          "style": "1",
+          "locale": "en",
+          "toolbar_bg": "#161b22",
+          "enable_publishing": false,
+          "hide_top_toolbar": false,
+          "hide_legend": false,
+          "save_image": false,
+          "backgroundColor": "#0d1117",
+          "gridColor": "#1c2128",
+          "hide_volume": false,
+          "studies": ["RSI@tv-basicstudies", "BB@tv-basicstudies"]
+        });
+      </script>
       <div class="tier-section">
-        <span class="stat-label">Tier Progress</span>
-        <div class="tier-track"><div class="tier-dot" style="left:10%" title="Tier 1: 10% → lock 5%"></div><div class="tier-dot" style="left:20%" title="Tier 2: 20% → lock 14%"></div><div class="tier-dot" style="left:30%" title="Tier 3: 30% → lock 22%"></div><div class="tier-dot" style="left:50%" title="Tier 4: 50% → lock 40%"></div><div class="tier-dot" style="left:75%" title="Tier 5: 75% → lock 60%"></div><div class="tier-dot" style="left:100%" title="Tier 6: 100% → lock 80%"></div><div class="current-marker" style="left:0%"></div></div>
+        <div class="tier-label">Tier Progress — next tier in 10.2%</div>
+        <div class="tier-track">
+          <div class="tier-dot " style="left:10%" title="Tier 1: +10% → lock +5%"></div><div class="tier-dot " style="left:20%" title="Tier 2: +20% → lock +14%"></div><div class="tier-dot " style="left:30%" title="Tier 3: +30% → lock +22%"></div><div class="tier-dot " style="left:50%" title="Tier 4: +50% → lock +40%"></div><div class="tier-dot " style="left:75%" title="Tier 5: +75% → lock +60%"></div><div class="tier-dot " style="left:100%" title="Tier 6: +100% → lock +80%"></div>
+          <div class="current-marker" style="left:0%"></div>
+        </div>
         <div class="tier-labels">
           <span style="left:10%">10%</span><span style="left:20%">20%</span><span style="left:30%">30%</span><span style="left:50%">50%</span><span style="left:75%">75%</span><span style="left:100%">100%</span>
         </div>
       </div>
     </div>
     
-    <div class="position-card">
-      <div class="pos-header">
-        <div class="pos-title">
-          <span class="asset-name">XRP</span>
-          <span style="color:#ff5252;font-weight:700">SHORT</span>
-          <span class="leverage">5×</span>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">
+          <span class="asset-name">XRP</span> <span class="dir-badge short">SHORT</span> <span class="dim">5×</span>
         </div>
-        <div class="pos-pnl negative">
-          -5.12 (-1.6%)
+        <div class="chart-pnl negative">
+          $-5.23 (-1.7%)
         </div>
       </div>
-      
-      <div class="pos-grid">
-        <div class="stat">
-          <span class="stat-label">Entry</span>
-          <span class="stat-value">$1.4231</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Mark</span>
-          <span class="stat-value">$1.4278</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Phase</span>
-          <span class="stat-value">🟢 Protect</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Tier</span>
-          <span class="stat-value">None</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Floor</span>
-          <span class="stat-value">$1.4396</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Tier Floor</span>
-          <span class="stat-value">—</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">High Water</span>
-          <span class="stat-value">$1.4183</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Locked Profit</span>
-          <span class="stat-value">$0.00</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Velocity</span>
-          <span class="stat-value negative">-0.0038</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Breaches</span>
-          <span class="stat-value">0/2</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">SL / TP</span>
-          <span class="stat-value">$1.5655 / $1.1385</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Next Tier In</span>
-          <span class="stat-value">11.6%</span>
-        </div>
+      <div class="chart-meta">
+        <span>Entry: <strong>$1.4231</strong></span>
+        <span>SL: <strong>$1.5655</strong></span>
+        <span>TP: <strong>$1.1385</strong></span>
+        <span>Floor: <strong>$1.4396</strong></span>
+        <span>HW: <strong>$1.4183</strong></span>
       </div>
-      
+      <div class="tv-chart" id="chart-xrp"></div>
+      <script>
+        new TradingView.widget({
+          "container_id": "chart-xrp",
+          "autosize": true,
+          "symbol": "BINANCE:XRPUSDT.P",
+          "interval": "15",
+          "timezone": "Etc/UTC",
+          "theme": "dark",
+          "style": "1",
+          "locale": "en",
+          "toolbar_bg": "#161b22",
+          "enable_publishing": false,
+          "hide_top_toolbar": false,
+          "hide_legend": false,
+          "save_image": false,
+          "backgroundColor": "#0d1117",
+          "gridColor": "#1c2128",
+          "hide_volume": false,
+          "studies": ["RSI@tv-basicstudies", "BB@tv-basicstudies"]
+        });
+      </script>
       <div class="tier-section">
-        <span class="stat-label">Tier Progress</span>
-        <div class="tier-track"><div class="tier-dot" style="left:10%" title="Tier 1: 10% → lock 5%"></div><div class="tier-dot" style="left:20%" title="Tier 2: 20% → lock 14%"></div><div class="tier-dot" style="left:30%" title="Tier 3: 30% → lock 22%"></div><div class="tier-dot" style="left:50%" title="Tier 4: 50% → lock 40%"></div><div class="tier-dot" style="left:75%" title="Tier 5: 75% → lock 60%"></div><div class="tier-dot" style="left:100%" title="Tier 6: 100% → lock 80%"></div><div class="current-marker" style="left:0%"></div></div>
+        <div class="tier-label">Tier Progress — next tier in 11.7%</div>
+        <div class="tier-track">
+          <div class="tier-dot " style="left:10%" title="Tier 1: +10% → lock +5%"></div><div class="tier-dot " style="left:20%" title="Tier 2: +20% → lock +14%"></div><div class="tier-dot " style="left:30%" title="Tier 3: +30% → lock +22%"></div><div class="tier-dot " style="left:50%" title="Tier 4: +50% → lock +40%"></div><div class="tier-dot " style="left:75%" title="Tier 5: +75% → lock +60%"></div><div class="tier-dot " style="left:100%" title="Tier 6: +100% → lock +80%"></div>
+          <div class="current-marker" style="left:0%"></div>
+        </div>
         <div class="tier-labels">
           <span style="left:10%">10%</span><span style="left:20%">20%</span><span style="left:30%">30%</span><span style="left:50%">50%</span><span style="left:75%">75%</span><span style="left:100%">100%</span>
         </div>
       </div>
     </div>
     
-  
-  <div class="phase-explainer">
-    <h3>📖 How DSL Phases Work</h3>
-    <p>
-      <span class="phase-name">🟡 Phase 1 — Accumulate:</span>
-      The position is building. A wide trailing stop (3% retrace from high-water mark) protects against
-      catastrophic drops, but gives room to breathe. The absolute floor (your SL) is the hard backstop.
-      Needs 3 consecutive breaches to close — one dip won't kill it.
-    </p>
-    <p>
-      <span class="phase-name">🟢 Phase 2 — Protect:</span>
-      Activates when uPnL hits the first tier (10%). The trailing stop tightens to 1.5% and tier floors
-      ratchet up — once profit is locked at a tier, it can't be lost. Only needs 2 breaches to close.
-      Higher tiers lock more profit and have even tighter stops.
-    </p>
-    <p>
-      <span class="phase-name">🎯 Tiers:</span>
-      Each tier triggers at a uPnL % and locks a floor. E.g., Tier 1 triggers at +10% and locks +5%.
-      Once locked, even if price retraces, the position closes at the tier floor — not at a loss.
-      Tiers only ratchet up, never down.
-    </p>
-  </div>
-  
-  <div class="footer">
-    Auto-generated by heartbeat · Data from Senpi via DSL v3
-  </div>
+
+<div class="explainer">
+  <h3>📖 DSL Phase System</h3>
+  <p>
+    <span class="hl">🟡 Phase 1 — Accumulate:</span>
+    Wide 3% trailing stop from high-water mark. Hard SL as absolute floor.
+    3 consecutive breaches needed to close. Gives the trade room to develop.
+  </p>
+  <p>
+    <span class="hl">🟢 Phase 2 — Protect:</span>
+    Activates at first tier (+10% uPnL). Trailing stop tightens to 1.5%.
+    Tier floors ratchet up — locked profit can't be lost. 2 breaches to close.
+  </p>
+  <p>
+    <span class="hl">🎯 Tiers:</span>
+    +10% → lock +5% · +20% → lock +14% · +30% → lock +22% ·
+    +50% → lock +40% · +75% → lock +60% · +100% → lock +80%.
+    Tiers only go up. Higher tiers get tighter trailing stops.
+  </p>
+</div>
+
+<div style="margin-top: 20px;">
+  <a class="recipes-link" href="https://github.com/rheeger/trading-dashboard/tree/main/recipes" target="_blank">
+    📦 View Trading Recipes →
+  </a>
+</div>
+
+<div class="footer">
+  Auto-generated by heartbeat · Data from Senpi via DSL v3 · <a href="https://senpi.ai" style="color:var(--accent)">senpi.ai</a>
+</div>
+
 </body>
 </html>
