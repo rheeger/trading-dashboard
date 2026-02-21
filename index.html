@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>⚡ Trading Dashboard</title>
-<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+<script src="https://unpkg.com/lightweight-charts@4/dist/lightweight-charts.standalone.production.js"></script>
 <style>
   :root {
     --bg: #0d1117; --card: #161b22; --border: #30363d;
@@ -116,33 +116,7 @@
     color: var(--dim); border-bottom: 1px solid var(--border); flex-wrap: wrap;
   }
   .chart-meta strong { color: var(--text); }
-  .chart-body {
-    display: flex; position: relative;
-  }
-  .tv-chart { height: 680px; flex: 1; min-width: 0; }
-  .levels-strip {
-    width: 54px; min-width: 54px; height: 680px; position: relative;
-    background: #0d1117; border-left: 1px solid var(--border);
-    font-size: 0.6em; font-family: 'SF Mono', 'Fira Code', monospace;
-  }
-  .level-marker {
-    position: absolute; right: 4px; transform: translateY(-50%);
-    padding: 2px 4px; border-radius: 3px; white-space: nowrap;
-    font-weight: 600; line-height: 1.2;
-  }
-  .level-marker.entry { background: rgba(88,166,255,0.25); color: var(--accent); border: 1px solid rgba(88,166,255,0.4); }
-  .level-marker.tp { background: rgba(0,230,118,0.2); color: var(--positive); border: 1px solid rgba(0,230,118,0.35); }
-  .level-marker.sl { background: rgba(255,82,82,0.2); color: var(--negative); border: 1px solid rgba(255,82,82,0.35); }
-  .level-marker.floor { background: rgba(255,171,0,0.2); color: #ffab00; border: 1px solid rgba(255,171,0,0.35); }
-  .level-marker.mark { background: rgba(255,255,255,0.1); color: var(--text); border: 1px solid rgba(255,255,255,0.2); }
-  .level-line {
-    position: absolute; left: 0; right: 54px; height: 1px; pointer-events: none;
-  }
-  .level-line.entry { border-top: 1px dashed var(--accent); }
-  .level-line.tp { border-top: 1px dashed var(--positive); }
-  .level-line.sl { border-top: 1px dashed var(--negative); }
-  .level-line.floor { border-top: 1px dashed #ffab00; }
-
+  .tv-chart { height: 680px; }
   .tier-section { padding: 12px 16px; border-top: 1px solid var(--border); }
   .tier-label {
     color: var(--dim); font-size: 0.75em; text-transform: uppercase;
@@ -212,18 +186,18 @@
   <h1>⚡ Trading Dashboard</h1>
   <div class="meta">
     <span class="live-dot"></span> <span id="live-status">Connecting to HL...</span><br>
-    Snapshot: Feb 21, 2026 05:42 UTC
+    Snapshot: Feb 21, 2026 05:45 UTC
   </div>
 </div>
 
 <div class="summary">
   <div class="summary-card">
     <div class="label">Account Value</div>
-    <div class="value" id="account-value">$1,042.61</div>
+    <div class="value" id="account-value">$1,042.69</div>
   </div>
   <div class="summary-card">
     <div class="label">Net uPnL</div>
-    <div class="value positive" id="net-upnl">$+2.83</div>
+    <div class="value positive" id="net-upnl">$+2.62</div>
   </div>
   <div class="summary-card">
     <div class="label">Margin Used</div>
@@ -268,8 +242,8 @@
       <td class="asset-cell"><strong>HYPE</strong></td>
       <td><span class="dir-badge long">LONG</span> <span class="dim">5×</span></td>
       <td>$30.1196</td>
-      <td class="mark-price" data-asset="HYPE">$30.2770</td>
-      <td class="upnl-cell positive" data-asset="HYPE">+$8.18 <span class="dim">(+2.6%)</span></td>
+      <td class="mark-price" data-asset="HYPE">$30.2645</td>
+      <td class="upnl-cell positive" data-asset="HYPE">+$7.53 <span class="dim">(+2.4%)</span></td>
       <td>🟡 Accumulate</td>
       <td>None</td>
       <td>$0.00</td>
@@ -279,8 +253,8 @@
       <td class="asset-cell"><strong>SOL</strong></td>
       <td><span class="dir-badge long">LONG</span> <span class="dim">5×</span></td>
       <td>$84.4530</td>
-      <td class="mark-price" data-asset="SOL">$84.4995</td>
-      <td class="upnl-cell positive" data-asset="SOL">+$0.86 <span class="dim">(+0.3%)</span></td>
+      <td class="mark-price" data-asset="SOL">$84.4875</td>
+      <td class="upnl-cell positive" data-asset="SOL">+$0.64 <span class="dim">(+0.2%)</span></td>
       <td>🟡 Accumulate</td>
       <td>None</td>
       <td>$0.00</td>
@@ -290,8 +264,8 @@
       <td class="asset-cell"><strong>XRP</strong></td>
       <td><span class="dir-badge short">SHORT</span> <span class="dim">5×</span></td>
       <td>$1.4231</td>
-      <td class="mark-price" data-asset="XRP">$1.4287</td>
-      <td class="upnl-cell negative" data-asset="XRP">$-6.21 <span class="dim">(-2.0%)</span></td>
+      <td class="mark-price" data-asset="XRP">$1.4282</td>
+      <td class="upnl-cell negative" data-asset="XRP">$-5.55 <span class="dim">(-1.8%)</span></td>
       <td>🟡 Accumulate</td>
       <td>None</td>
       <td>$0.00</td>
@@ -311,50 +285,85 @@
           <span class="dim">5×</span>
         </div>
         <div class="chart-pnl positive" data-asset="HYPE-chart-pnl">
-          +$8.18 (+2.6%)
+          +$7.53 (+2.4%)
         </div>
       </div>
       <div class="chart-meta">
-        <span>🔵 Entry: <strong>$30.1196</strong></span>
-        <span>⚪ Mark: <strong class="live-mark" data-asset="HYPE">$30.2770</strong></span>
-        <span>🔴 SL: <strong>$27.1130</strong></span>
-        <span>🟢 TP: <strong>$36.1500</strong></span>
-        <span>🟡 Floor: <strong>$30.0144</strong></span>
+        <span>Entry: <strong>$30.1196</strong></span>
+        <span>Mark: <strong class="live-mark" data-asset="HYPE">$30.2645</strong></span>
+        <span>SL: <strong>$27.1130</strong></span>
+        <span>TP: <strong>$36.1500</strong></span>
+        <span>Floor: <strong>$30.0144</strong></span>
         <span>HW: <strong>$30.4715</strong></span>
       </div>
-      <div class="chart-body" id="chart-body-hype">
-        <div class="tv-chart" id="chart-hype"></div>
-        <div class="levels-strip" id="levels-hype"></div>
-      </div>
+      <div class="tv-chart" id="chart-hype"></div>
       <script>
-        new TradingView.widget({
-          "container_id": "chart-hype",
-          "autosize": true,
-          "symbol": "BYBIT:HYPEUSDT.P",
-          "interval": "15",
-          "timezone": "Etc/UTC",
-          "theme": "dark",
-          "style": "1",
-          "locale": "en",
-          "toolbar_bg": "#161b22",
-          "enable_publishing": false,
-          "hide_top_toolbar": false,
-          "hide_legend": false,
-          "save_image": false,
-          "backgroundColor": "#0d1117",
-          "gridColor": "#1c2128",
-          "hide_volume": false,
-          "studies": ["RSI@tv-basicstudies", "BB@tv-basicstudies"]
-        });
-        // Register levels for this chart
-        if (!window._chartLevels) window._chartLevels = {};
-        window._chartLevels['HYPE'] = {"asset": "HYPE", "entry": 30.1196, "sl": 27.113, "tp": 36.15, "floor": 30.0144, "mark": 30.277};
+        (function() {
+          const el = document.getElementById('chart-hype');
+          const chart = LightweightCharts.createChart(el, {
+            layout: { background: { color: '#0d1117' }, textColor: '#e6edf3' },
+            grid: { vertLines: { color: '#1c2128' }, horzLines: { color: '#1c2128' } },
+            timeScale: { timeVisible: true, secondsVisible: false },
+            rightPriceScale: { borderColor: '#30363d' },
+            crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+          });
+          const series = chart.addCandlestickSeries({
+            upColor: '#00e676', downColor: '#ff5252',
+            borderUpColor: '#00e676', borderDownColor: '#ff5252',
+            wickUpColor: '#00e676', wickDownColor: '#ff5252',
+          });
+          const volSeries = chart.addHistogramSeries({
+            priceFormat: { type: 'volume' },
+            priceScaleId: 'vol',
+          });
+          chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.85, bottom: 0 } });
+
+          // Fetch OHLC from Binance
+          fetch('https://fapi.binance.com/fapi/v1/klines?symbol=HYPEUSDT&interval=15m&limit=300')
+            .then(r => r.json())
+            .then(data => {
+              if (!Array.isArray(data)) return;
+              const candles = data.map(c => ({
+                time: c[0] / 1000,
+                open: parseFloat(c[1]),
+                high: parseFloat(c[2]),
+                low: parseFloat(c[3]),
+                close: parseFloat(c[4]),
+              }));
+              series.setData(candles);
+              volSeries.setData(data.map(c => ({
+                time: c[0] / 1000,
+                value: parseFloat(c[5]),
+                color: parseFloat(c[4]) >= parseFloat(c[1]) ? 'rgba(0,230,118,0.3)' : 'rgba(255,82,82,0.3)',
+              })));
+              chart.timeScale().fitContent();
+            }).catch(() => {});
+
+          // Draw price lines with labels
+          const levels = [{"price": 30.1196, "color": "#58a6ff", "title": "ENTRY"}, {"price": 27.113, "color": "#ff5252", "title": "SL"}, {"price": 36.15, "color": "#00e676", "title": "TP"}, {"price": 30.0144, "color": "#ffab00", "title": "FLOOR"}, {"price": 30.4715, "color": "#b388ff", "title": "HW"}];
+          levels.forEach(l => {
+            series.createPriceLine({
+              price: l.price,
+              color: l.color,
+              lineWidth: 1,
+              lineStyle: LightweightCharts.LineStyle.Dashed,
+              axisLabelVisible: true,
+              title: l.title,
+            });
+          });
+
+          // Resize on window change
+          const ro = new ResizeObserver(() => {
+            chart.applyOptions({ width: el.clientWidth, height: el.clientHeight });
+          });
+          ro.observe(el);
+        })();
       </script>
       <div class="tier-section">
-        <div class="tier-label">Tier Progress — next tier in 7.4%</div>
+        <div class="tier-label">Tier Progress — next tier in 7.6%</div>
         <div class="tier-track">
           <div class="tier-dot " style="left:10%" title="Tier 1: +10% → lock +5%"></div><div class="tier-dot " style="left:20%" title="Tier 2: +20% → lock +14%"></div><div class="tier-dot " style="left:30%" title="Tier 3: +30% → lock +22%"></div><div class="tier-dot " style="left:50%" title="Tier 4: +50% → lock +40%"></div><div class="tier-dot " style="left:75%" title="Tier 5: +75% → lock +60%"></div><div class="tier-dot " style="left:100%" title="Tier 6: +100% → lock +80%"></div>
-          <div class="current-marker" style="left:2.61%"></div>
+          <div class="current-marker" style="left:2.41%"></div>
         </div>
         <div class="tier-labels">
           <span style="left:10%">10%</span><span style="left:20%">20%</span><span style="left:30%">30%</span><span style="left:50%">50%</span><span style="left:75%">75%</span><span style="left:100%">100%</span>
@@ -370,50 +379,85 @@
           <span class="dim">5×</span>
         </div>
         <div class="chart-pnl positive" data-asset="SOL-chart-pnl">
-          +$0.86 (+0.3%)
+          +$0.64 (+0.2%)
         </div>
       </div>
       <div class="chart-meta">
-        <span>🔵 Entry: <strong>$84.4530</strong></span>
-        <span>⚪ Mark: <strong class="live-mark" data-asset="SOL">$84.4995</strong></span>
-        <span>🔴 SL: <strong>$75.9960</strong></span>
-        <span>🟢 TP: <strong>$101.3300</strong></span>
-        <span>🟡 Floor: <strong>$84.0062</strong></span>
+        <span>Entry: <strong>$84.4530</strong></span>
+        <span>Mark: <strong class="live-mark" data-asset="SOL">$84.4875</strong></span>
+        <span>SL: <strong>$75.9960</strong></span>
+        <span>TP: <strong>$101.3300</strong></span>
+        <span>Floor: <strong>$84.0062</strong></span>
         <span>HW: <strong>$85.2855</strong></span>
       </div>
-      <div class="chart-body" id="chart-body-sol">
-        <div class="tv-chart" id="chart-sol"></div>
-        <div class="levels-strip" id="levels-sol"></div>
-      </div>
+      <div class="tv-chart" id="chart-sol"></div>
       <script>
-        new TradingView.widget({
-          "container_id": "chart-sol",
-          "autosize": true,
-          "symbol": "BINANCE:SOLUSDT.P",
-          "interval": "15",
-          "timezone": "Etc/UTC",
-          "theme": "dark",
-          "style": "1",
-          "locale": "en",
-          "toolbar_bg": "#161b22",
-          "enable_publishing": false,
-          "hide_top_toolbar": false,
-          "hide_legend": false,
-          "save_image": false,
-          "backgroundColor": "#0d1117",
-          "gridColor": "#1c2128",
-          "hide_volume": false,
-          "studies": ["RSI@tv-basicstudies", "BB@tv-basicstudies"]
-        });
-        // Register levels for this chart
-        if (!window._chartLevels) window._chartLevels = {};
-        window._chartLevels['SOL'] = {"asset": "SOL", "entry": 84.453, "sl": 75.996, "tp": 101.33, "floor": 84.0062, "mark": 84.4995};
+        (function() {
+          const el = document.getElementById('chart-sol');
+          const chart = LightweightCharts.createChart(el, {
+            layout: { background: { color: '#0d1117' }, textColor: '#e6edf3' },
+            grid: { vertLines: { color: '#1c2128' }, horzLines: { color: '#1c2128' } },
+            timeScale: { timeVisible: true, secondsVisible: false },
+            rightPriceScale: { borderColor: '#30363d' },
+            crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+          });
+          const series = chart.addCandlestickSeries({
+            upColor: '#00e676', downColor: '#ff5252',
+            borderUpColor: '#00e676', borderDownColor: '#ff5252',
+            wickUpColor: '#00e676', wickDownColor: '#ff5252',
+          });
+          const volSeries = chart.addHistogramSeries({
+            priceFormat: { type: 'volume' },
+            priceScaleId: 'vol',
+          });
+          chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.85, bottom: 0 } });
+
+          // Fetch OHLC from Binance
+          fetch('https://fapi.binance.com/fapi/v1/klines?symbol=SOLUSDT&interval=15m&limit=300')
+            .then(r => r.json())
+            .then(data => {
+              if (!Array.isArray(data)) return;
+              const candles = data.map(c => ({
+                time: c[0] / 1000,
+                open: parseFloat(c[1]),
+                high: parseFloat(c[2]),
+                low: parseFloat(c[3]),
+                close: parseFloat(c[4]),
+              }));
+              series.setData(candles);
+              volSeries.setData(data.map(c => ({
+                time: c[0] / 1000,
+                value: parseFloat(c[5]),
+                color: parseFloat(c[4]) >= parseFloat(c[1]) ? 'rgba(0,230,118,0.3)' : 'rgba(255,82,82,0.3)',
+              })));
+              chart.timeScale().fitContent();
+            }).catch(() => {});
+
+          // Draw price lines with labels
+          const levels = [{"price": 84.453, "color": "#58a6ff", "title": "ENTRY"}, {"price": 75.996, "color": "#ff5252", "title": "SL"}, {"price": 101.33, "color": "#00e676", "title": "TP"}, {"price": 84.0062, "color": "#ffab00", "title": "FLOOR"}, {"price": 85.2855, "color": "#b388ff", "title": "HW"}];
+          levels.forEach(l => {
+            series.createPriceLine({
+              price: l.price,
+              color: l.color,
+              lineWidth: 1,
+              lineStyle: LightweightCharts.LineStyle.Dashed,
+              axisLabelVisible: true,
+              title: l.title,
+            });
+          });
+
+          // Resize on window change
+          const ro = new ResizeObserver(() => {
+            chart.applyOptions({ width: el.clientWidth, height: el.clientHeight });
+          });
+          ro.observe(el);
+        })();
       </script>
       <div class="tier-section">
-        <div class="tier-label">Tier Progress — next tier in 9.7%</div>
+        <div class="tier-label">Tier Progress — next tier in 9.8%</div>
         <div class="tier-track">
           <div class="tier-dot " style="left:10%" title="Tier 1: +10% → lock +5%"></div><div class="tier-dot " style="left:20%" title="Tier 2: +20% → lock +14%"></div><div class="tier-dot " style="left:30%" title="Tier 3: +30% → lock +22%"></div><div class="tier-dot " style="left:50%" title="Tier 4: +50% → lock +40%"></div><div class="tier-dot " style="left:75%" title="Tier 5: +75% → lock +60%"></div><div class="tier-dot " style="left:100%" title="Tier 6: +100% → lock +80%"></div>
-          <div class="current-marker" style="left:0.28%"></div>
+          <div class="current-marker" style="left:0.2%"></div>
         </div>
         <div class="tier-labels">
           <span style="left:10%">10%</span><span style="left:20%">20%</span><span style="left:30%">30%</span><span style="left:50%">50%</span><span style="left:75%">75%</span><span style="left:100%">100%</span>
@@ -429,47 +473,82 @@
           <span class="dim">5×</span>
         </div>
         <div class="chart-pnl negative" data-asset="XRP-chart-pnl">
-          $-6.21 (-2.0%)
+          $-5.55 (-1.8%)
         </div>
       </div>
       <div class="chart-meta">
-        <span>🔵 Entry: <strong>$1.4231</strong></span>
-        <span>⚪ Mark: <strong class="live-mark" data-asset="XRP">$1.4287</strong></span>
-        <span>🔴 SL: <strong>$1.5655</strong></span>
-        <span>🟢 TP: <strong>$1.1385</strong></span>
-        <span>🟡 Floor: <strong>$1.4396</strong></span>
+        <span>Entry: <strong>$1.4231</strong></span>
+        <span>Mark: <strong class="live-mark" data-asset="XRP">$1.4282</strong></span>
+        <span>SL: <strong>$1.5655</strong></span>
+        <span>TP: <strong>$1.1385</strong></span>
+        <span>Floor: <strong>$1.4396</strong></span>
         <span>HW: <strong>$1.4183</strong></span>
       </div>
-      <div class="chart-body" id="chart-body-xrp">
-        <div class="tv-chart" id="chart-xrp"></div>
-        <div class="levels-strip" id="levels-xrp"></div>
-      </div>
+      <div class="tv-chart" id="chart-xrp"></div>
       <script>
-        new TradingView.widget({
-          "container_id": "chart-xrp",
-          "autosize": true,
-          "symbol": "BINANCE:XRPUSDT.P",
-          "interval": "15",
-          "timezone": "Etc/UTC",
-          "theme": "dark",
-          "style": "1",
-          "locale": "en",
-          "toolbar_bg": "#161b22",
-          "enable_publishing": false,
-          "hide_top_toolbar": false,
-          "hide_legend": false,
-          "save_image": false,
-          "backgroundColor": "#0d1117",
-          "gridColor": "#1c2128",
-          "hide_volume": false,
-          "studies": ["RSI@tv-basicstudies", "BB@tv-basicstudies"]
-        });
-        // Register levels for this chart
-        if (!window._chartLevels) window._chartLevels = {};
-        window._chartLevels['XRP'] = {"asset": "XRP", "entry": 1.4231, "sl": 1.5655, "tp": 1.1385, "floor": 1.4396, "mark": 1.42875};
+        (function() {
+          const el = document.getElementById('chart-xrp');
+          const chart = LightweightCharts.createChart(el, {
+            layout: { background: { color: '#0d1117' }, textColor: '#e6edf3' },
+            grid: { vertLines: { color: '#1c2128' }, horzLines: { color: '#1c2128' } },
+            timeScale: { timeVisible: true, secondsVisible: false },
+            rightPriceScale: { borderColor: '#30363d' },
+            crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+          });
+          const series = chart.addCandlestickSeries({
+            upColor: '#00e676', downColor: '#ff5252',
+            borderUpColor: '#00e676', borderDownColor: '#ff5252',
+            wickUpColor: '#00e676', wickDownColor: '#ff5252',
+          });
+          const volSeries = chart.addHistogramSeries({
+            priceFormat: { type: 'volume' },
+            priceScaleId: 'vol',
+          });
+          chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.85, bottom: 0 } });
+
+          // Fetch OHLC from Binance
+          fetch('https://fapi.binance.com/fapi/v1/klines?symbol=XRPUSDT&interval=15m&limit=300')
+            .then(r => r.json())
+            .then(data => {
+              if (!Array.isArray(data)) return;
+              const candles = data.map(c => ({
+                time: c[0] / 1000,
+                open: parseFloat(c[1]),
+                high: parseFloat(c[2]),
+                low: parseFloat(c[3]),
+                close: parseFloat(c[4]),
+              }));
+              series.setData(candles);
+              volSeries.setData(data.map(c => ({
+                time: c[0] / 1000,
+                value: parseFloat(c[5]),
+                color: parseFloat(c[4]) >= parseFloat(c[1]) ? 'rgba(0,230,118,0.3)' : 'rgba(255,82,82,0.3)',
+              })));
+              chart.timeScale().fitContent();
+            }).catch(() => {});
+
+          // Draw price lines with labels
+          const levels = [{"price": 1.4231, "color": "#58a6ff", "title": "ENTRY"}, {"price": 1.5655, "color": "#ff5252", "title": "SL"}, {"price": 1.1385, "color": "#00e676", "title": "TP"}, {"price": 1.4396, "color": "#ffab00", "title": "FLOOR"}, {"price": 1.41835, "color": "#b388ff", "title": "HW"}];
+          levels.forEach(l => {
+            series.createPriceLine({
+              price: l.price,
+              color: l.color,
+              lineWidth: 1,
+              lineStyle: LightweightCharts.LineStyle.Dashed,
+              axisLabelVisible: true,
+              title: l.title,
+            });
+          });
+
+          // Resize on window change
+          const ro = new ResizeObserver(() => {
+            chart.applyOptions({ width: el.clientWidth, height: el.clientHeight });
+          });
+          ro.observe(el);
+        })();
       </script>
       <div class="tier-section">
-        <div class="tier-label">Tier Progress — next tier in 12.0%</div>
+        <div class="tier-label">Tier Progress — next tier in 11.8%</div>
         <div class="tier-track">
           <div class="tier-dot " style="left:10%" title="Tier 1: +10% → lock +5%"></div><div class="tier-dot " style="left:20%" title="Tier 2: +20% → lock +14%"></div><div class="tier-dot " style="left:30%" title="Tier 3: +30% → lock +22%"></div><div class="tier-dot " style="left:50%" title="Tier 4: +50% → lock +40%"></div><div class="tier-dot " style="left:75%" title="Tier 5: +75% → lock +60%"></div><div class="tier-dot " style="left:100%" title="Tier 6: +100% → lock +80%"></div>
           <div class="current-marker" style="left:0%"></div>
@@ -601,8 +680,8 @@ async function fetchPrices() {
     }
 
     // Estimate account value
-    const snapshotUpnl = 2.829999999999999;
-    const snapshotAcctVal = 1042.609756;
+    const snapshotUpnl = 2.62;
+    const snapshotAcctVal = 1042.694666;
     const liveAcctVal = snapshotAcctVal + (totalUpnl - snapshotUpnl);
     const acctEl = document.getElementById('account-value');
     acctEl.textContent = '$' + liveAcctVal.toFixed(2);
@@ -625,53 +704,9 @@ async function fetchPrices() {
   }
 }
 
-// Render level markers on the strips
-function renderLevels() {
-  if (!window._chartLevels) return;
-  Object.entries(window._chartLevels).forEach(([asset, lvl]) => {
-    const strip = document.getElementById('levels-' + asset.toLowerCase());
-    if (!strip) return;
-
-    const mark = lastPrices[asset] || lvl.mark;
-    const prices = [lvl.entry, lvl.sl, lvl.tp, mark];
-    if (lvl.floor) prices.push(lvl.floor);
-
-    const hi = Math.max(...prices) * 1.005;
-    const lo = Math.min(...prices) * 0.995;
-    const range = hi - lo;
-    if (range <= 0) return;
-
-    // Map price to % from top (0% = hi, 100% = lo)
-    const toTop = (p) => Math.max(2, Math.min(98, ((hi - p) / range) * 100));
-
-    // Precision
-    const dec = lvl.entry >= 100 ? 2 : lvl.entry >= 1 ? 4 : 5;
-    const fmt = (v) => v.toFixed(dec);
-
-    strip.innerHTML = `
-      <div class="level-marker entry" style="top:${toTop(lvl.entry)}%">▸ ${fmt(lvl.entry)}<br><span style="font-size:0.85em">ENTRY</span></div>
-      <div class="level-marker tp" style="top:${toTop(lvl.tp)}%">▸ ${fmt(lvl.tp)}<br><span style="font-size:0.85em">TP</span></div>
-      <div class="level-marker sl" style="top:${toTop(lvl.sl)}%">▸ ${fmt(lvl.sl)}<br><span style="font-size:0.85em">SL</span></div>
-      <div class="level-marker mark" style="top:${toTop(mark)}%">▸ ${fmt(mark)}<br><span style="font-size:0.85em">MARK</span></div>
-      ${lvl.floor ? `<div class="level-marker floor" style="top:${toTop(lvl.floor)}%">▸ ${fmt(lvl.floor)}<br><span style="font-size:0.85em">FLOOR</span></div>` : ''}
-    `;
-  });
-}
-
-// Update levels mark price on each tick
-function updateLevelsMark() {
-  if (!window._chartLevels) return;
-  Object.entries(window._chartLevels).forEach(([asset, lvl]) => {
-    if (lastPrices[asset]) lvl.mark = lastPrices[asset];
-  });
-  renderLevels();
-}
-
 // Initial fetch + poll every 5 seconds
 fetchPrices();
-setInterval(() => { fetchPrices().then(updateLevelsMark); }, 5000);
-// Render levels after a short delay for DOM
-setTimeout(renderLevels, 2000);
+setInterval(fetchPrices, 5000);
 </script>
 
 </body>
