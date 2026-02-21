@@ -97,8 +97,8 @@
   .dir-badge.short { background: rgba(255, 82, 82, 0.15); color: var(--short); }
 
   .charts-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
-    gap: 16px; margin-bottom: 24px;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px; margin-bottom: 24px;
   }
   .chart-card {
     background: var(--card); border: 1px solid var(--border);
@@ -173,6 +173,9 @@
   @media (max-width: 768px) {
     body { padding: 12px; }
     .charts-grid { grid-template-columns: 1fr; }
+  }
+  @media (min-width: 769px) and (max-width: 1100px) {
+    .charts-grid { grid-template-columns: repeat(2, 1fr); }
     .tv-chart { height: 300px; }
     .summary { grid-template-columns: repeat(2, 1fr); }
   }
@@ -184,22 +187,22 @@
   <h1>⚡ Trading Dashboard</h1>
   <div class="meta">
     <span class="live-dot"></span> <span id="live-status">Connecting to HL...</span><br>
-    Snapshot: Feb 21, 2026 05:33 UTC
+    Snapshot: Feb 21, 2026 05:35 UTC
   </div>
 </div>
 
 <div class="summary">
   <div class="summary-card">
     <div class="label">Account Value</div>
-    <div class="value" id="account-value">$1,038.19</div>
+    <div class="value" id="account-value">$1,038.95</div>
   </div>
   <div class="summary-card">
     <div class="label">Net uPnL</div>
-    <div class="value negative" id="net-upnl">$-1.82</div>
+    <div class="value negative" id="net-upnl">$-1.09</div>
   </div>
   <div class="summary-card">
     <div class="label">Margin Used</div>
-    <div class="value">$933</div>
+    <div class="value">$934</div>
   </div>
   <div class="summary-card">
     <div class="label">Initial</div>
@@ -218,10 +221,10 @@
 <div class="progress-container">
   <div class="progress-header">
     <span>Progress to $2,500</span>
-    <span class="dim" id="progress-text">$1,038 / $2,500 (41.5%)</span>
+    <span class="dim" id="progress-text">$1,039 / $2,500 (41.6%)</span>
   </div>
   <div class="progress-bar">
-    <div class="progress-fill" id="progress-bar" style="width: 41.5%"></div>
+    <div class="progress-fill" id="progress-bar" style="width: 41.6%"></div>
   </div>
 </div>
 
@@ -240,8 +243,8 @@
       <td class="asset-cell"><strong>HYPE</strong></td>
       <td><span class="dir-badge long">LONG</span> <span class="dim">5×</span></td>
       <td>$30.1196</td>
-      <td class="mark-price" data-asset="HYPE">$30.2495</td>
-      <td class="upnl-cell positive" data-asset="HYPE">+$6.75 <span class="dim">(+2.2%)</span></td>
+      <td class="mark-price" data-asset="HYPE">$30.2435</td>
+      <td class="upnl-cell positive" data-asset="HYPE">+$6.44 <span class="dim">(+2.1%)</span></td>
       <td>🟡 Accumulate</td>
       <td>None</td>
       <td>$0.00</td>
@@ -251,8 +254,8 @@
       <td class="asset-cell"><strong>SOL</strong></td>
       <td><span class="dir-badge long">LONG</span> <span class="dim">5×</span></td>
       <td>$84.4530</td>
-      <td class="mark-price" data-asset="SOL">$84.3915</td>
-      <td class="upnl-cell negative" data-asset="SOL">$-1.14 <span class="dim">(-0.4%)</span></td>
+      <td class="mark-price" data-asset="SOL">$84.4115</td>
+      <td class="upnl-cell negative" data-asset="SOL">$-0.77 <span class="dim">(-0.2%)</span></td>
       <td>🟡 Accumulate</td>
       <td>None</td>
       <td>$0.00</td>
@@ -262,8 +265,8 @@
       <td class="asset-cell"><strong>XRP</strong></td>
       <td><span class="dir-badge short">SHORT</span> <span class="dim">5×</span></td>
       <td>$1.4231</td>
-      <td class="mark-price" data-asset="XRP">$1.4299</td>
-      <td class="upnl-cell negative" data-asset="XRP">$-7.43 <span class="dim">(-2.4%)</span></td>
+      <td class="mark-price" data-asset="XRP">$1.4292</td>
+      <td class="upnl-cell negative" data-asset="XRP">$-6.76 <span class="dim">(-2.2%)</span></td>
       <td>🟡 Accumulate</td>
       <td>None</td>
       <td>$0.00</td>
@@ -283,12 +286,12 @@
           <span class="dim">5×</span>
         </div>
         <div class="chart-pnl positive" data-asset="HYPE-chart-pnl">
-          +$6.75 (+2.2%)
+          +$6.44 (+2.1%)
         </div>
       </div>
       <div class="chart-meta">
         <span>Entry: <strong>$30.1196</strong></span>
-        <span>Mark: <strong class="live-mark" data-asset="HYPE">$30.2495</strong></span>
+        <span>Mark: <strong class="live-mark" data-asset="HYPE">$30.2435</strong></span>
         <span>SL: <strong>$27.1130</strong></span>
         <span>TP: <strong>$36.1500</strong></span>
         <span>Floor: <strong>$30.0144</strong></span>
@@ -317,10 +320,10 @@
         });
       </script>
       <div class="tier-section">
-        <div class="tier-label">Tier Progress — next tier in 7.8%</div>
+        <div class="tier-label">Tier Progress — next tier in 7.9%</div>
         <div class="tier-track">
           <div class="tier-dot " style="left:10%" title="Tier 1: +10% → lock +5%"></div><div class="tier-dot " style="left:20%" title="Tier 2: +20% → lock +14%"></div><div class="tier-dot " style="left:30%" title="Tier 3: +30% → lock +22%"></div><div class="tier-dot " style="left:50%" title="Tier 4: +50% → lock +40%"></div><div class="tier-dot " style="left:75%" title="Tier 5: +75% → lock +60%"></div><div class="tier-dot " style="left:100%" title="Tier 6: +100% → lock +80%"></div>
-          <div class="current-marker" style="left:2.16%"></div>
+          <div class="current-marker" style="left:2.06%"></div>
         </div>
         <div class="tier-labels">
           <span style="left:10%">10%</span><span style="left:20%">20%</span><span style="left:30%">30%</span><span style="left:50%">50%</span><span style="left:75%">75%</span><span style="left:100%">100%</span>
@@ -336,12 +339,12 @@
           <span class="dim">5×</span>
         </div>
         <div class="chart-pnl negative" data-asset="SOL-chart-pnl">
-          $-1.14 (-0.4%)
+          $-0.77 (-0.2%)
         </div>
       </div>
       <div class="chart-meta">
         <span>Entry: <strong>$84.4530</strong></span>
-        <span>Mark: <strong class="live-mark" data-asset="SOL">$84.3915</strong></span>
+        <span>Mark: <strong class="live-mark" data-asset="SOL">$84.4115</strong></span>
         <span>SL: <strong>$75.9960</strong></span>
         <span>TP: <strong>$101.3300</strong></span>
         <span>Floor: <strong>$84.0062</strong></span>
@@ -370,7 +373,7 @@
         });
       </script>
       <div class="tier-section">
-        <div class="tier-label">Tier Progress — next tier in 10.4%</div>
+        <div class="tier-label">Tier Progress — next tier in 10.2%</div>
         <div class="tier-track">
           <div class="tier-dot " style="left:10%" title="Tier 1: +10% → lock +5%"></div><div class="tier-dot " style="left:20%" title="Tier 2: +20% → lock +14%"></div><div class="tier-dot " style="left:30%" title="Tier 3: +30% → lock +22%"></div><div class="tier-dot " style="left:50%" title="Tier 4: +50% → lock +40%"></div><div class="tier-dot " style="left:75%" title="Tier 5: +75% → lock +60%"></div><div class="tier-dot " style="left:100%" title="Tier 6: +100% → lock +80%"></div>
           <div class="current-marker" style="left:0%"></div>
@@ -389,12 +392,12 @@
           <span class="dim">5×</span>
         </div>
         <div class="chart-pnl negative" data-asset="XRP-chart-pnl">
-          $-7.43 (-2.4%)
+          $-6.76 (-2.2%)
         </div>
       </div>
       <div class="chart-meta">
         <span>Entry: <strong>$1.4231</strong></span>
-        <span>Mark: <strong class="live-mark" data-asset="XRP">$1.4299</strong></span>
+        <span>Mark: <strong class="live-mark" data-asset="XRP">$1.4292</strong></span>
         <span>SL: <strong>$1.5655</strong></span>
         <span>TP: <strong>$1.1385</strong></span>
         <span>Floor: <strong>$1.4396</strong></span>
@@ -423,7 +426,7 @@
         });
       </script>
       <div class="tier-section">
-        <div class="tier-label">Tier Progress — next tier in 12.4%</div>
+        <div class="tier-label">Tier Progress — next tier in 12.2%</div>
         <div class="tier-track">
           <div class="tier-dot " style="left:10%" title="Tier 1: +10% → lock +5%"></div><div class="tier-dot " style="left:20%" title="Tier 2: +20% → lock +14%"></div><div class="tier-dot " style="left:30%" title="Tier 3: +30% → lock +22%"></div><div class="tier-dot " style="left:50%" title="Tier 4: +50% → lock +40%"></div><div class="tier-dot " style="left:75%" title="Tier 5: +75% → lock +60%"></div><div class="tier-dot " style="left:100%" title="Tier 6: +100% → lock +80%"></div>
           <div class="current-marker" style="left:0%"></div>
@@ -555,8 +558,8 @@ async function fetchPrices() {
     }
 
     // Estimate account value
-    const snapshotUpnl = -1.8199999999999994;
-    const snapshotAcctVal = 1038.192416;
+    const snapshotUpnl = -1.0899999999999999;
+    const snapshotAcctVal = 1038.948376;
     const liveAcctVal = snapshotAcctVal + (totalUpnl - snapshotUpnl);
     const acctEl = document.getElementById('account-value');
     acctEl.textContent = '$' + liveAcctVal.toFixed(2);
